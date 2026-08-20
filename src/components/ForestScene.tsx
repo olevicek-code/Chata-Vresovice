@@ -98,6 +98,7 @@ function Deer({
   delay = 0,
   flip = false,
   tone = "#152318",
+  antlers = true,
 }: {
   size?: number;
   top: string;
@@ -105,6 +106,7 @@ function Deer({
   delay?: number;
   flip?: boolean;
   tone?: string;
+  antlers?: boolean;
 }) {
   return (
     <motion.div
@@ -177,16 +179,108 @@ function Deer({
           {/* ear */}
           <path d="M166 30 C170 24 176 22 180 25 C177 30 172 32 166 30 Z" />
 
-          {/* antlers – a few elegant branching tines */}
-          <path
-            d="M181 22 C180 12 176 4 170 -2 M181 22 C184 12 189 6 196 3
-               M183 15 C187 10 192 8 197 9 M178 16 C174 10 168 7 162 8"
-            stroke={tone}
-            strokeWidth="2.6"
-            strokeLinecap="round"
-            fill="none"
-          />
+          {/* antlers – a few elegant branching tines (bucks only; does go
+              without, which also reads correctly for a roe deer/srnka) */}
+          {antlers && (
+            <path
+              d="M181 22 C180 12 176 4 170 -2 M181 22 C184 12 189 6 196 3
+                 M183 15 C187 10 192 8 197 9 M178 16 C174 10 168 7 162 8"
+              stroke={tone}
+              strokeWidth="2.6"
+              strokeLinecap="round"
+              fill="none"
+            />
+          )}
         </g>
+      </motion.svg>
+    </motion.div>
+  );
+}
+
+function Fox({
+  size = 1,
+  top,
+  duration,
+  delay = 0,
+  flip = false,
+  tone = "#3a2113",
+}: {
+  size?: number;
+  top: string;
+  duration: number;
+  delay?: number;
+  flip?: boolean;
+  tone?: string;
+}) {
+  return (
+    <motion.div
+      className="absolute"
+      style={{ top, left: 0, width: 0, height: 0 }}
+      initial={{ x: "-20vw" }}
+      animate={{ x: "120vw" }}
+      transition={{ duration, delay, repeat: Infinity, ease: "linear" }}
+    >
+      <motion.svg
+        viewBox="0 0 160 100"
+        width={96 * size}
+        height={60 * size}
+        style={{
+          transform: flip ? "scaleX(-1)" : undefined,
+          filter: "drop-shadow(0 5px 8px rgba(0,0,0,0.25))",
+        }}
+        animate={{ y: [0, -4, 0, -2, 0] }}
+        transition={{ duration: 0.5, repeat: Infinity, ease: "easeInOut" }}
+        aria-hidden
+      >
+        <g fill={tone}>
+          {/* bushy tail, curling up behind */}
+          <path d="M46 58 C30 56 16 48 14 34 C13 24 19 16 28 16 C24 26 26 38 34 46 C38 50 42 54 46 58 Z" />
+
+          {/* hind leg (back) */}
+          <path d="M54 66 C51 74 47 79 42 88 C45 90 49 90 51 87 C55 79 58 72 60 66 Z" />
+          {/* hind leg (front) */}
+          <path d="M66 68 C64 76 62 81 59 89 C62 91 66 91 68 88 C71 80 72 73 73 67 Z" />
+          {/* front leg (back) */}
+          <path d="M108 64 C110 73 107 79 103 88 C106 90 110 90 112 87 C116 78 117 71 116 63 Z" />
+          {/* front leg (front) */}
+          <path d="M120 62 C124 71 123 78 121 87 C124 89 128 89 130 86 C133 77 132 69 129 61 Z" />
+
+          {/* low, elongated body */}
+          <path
+            d="M40 60
+               C28 58 20 51 21 43
+               C22 36 32 32 44 33
+               C58 34 72 39 83 46
+               C92 42 102 40 110 42
+               C116 44 118 49 114 52
+               C119 53 122 57 120 61
+               C116 64 109 62 105 58
+               C96 63 84 65 72 63
+               C66 66 56 66 48 63
+               C44 65 40 63 40 60 Z"
+          />
+
+          {/* head + pointed snout, held forward and slightly down */}
+          <path
+            d="M104 42
+               C112 36 121 31 129 28
+               C133 27 137 29 136 33
+               C135 36 130 38 126 39
+               C130 40 132 43 130 46
+               C127 49 121 48 117 45
+               C112 49 106 49 102 46 Z"
+          />
+
+          {/* pointed ear */}
+          <path d="M114 30 C115 23 119 17 125 15 C124 22 122 28 118 32 Z" />
+        </g>
+
+        {/* lighter belly/chest marking, typical of a red fox, for extra charm */}
+        <path
+          d="M50 55 C58 58 68 60 78 58 C74 62 64 63 55 61 C52 60 50 58 50 55 Z"
+          fill="#c98f5e"
+          fillOpacity={0.35}
+        />
       </motion.svg>
     </motion.div>
   );
@@ -315,8 +409,13 @@ export default function ForestScene() {
           the near tree line so they stay clearly visible */}
       {!reduceMotion && (
         <>
+          {/* stag, with antlers */}
           <Deer top="71%" duration={30} size={1.4} />
-          <Deer top="76%" duration={38} size={0.85} delay={7} flip tone="#1c2c1f" />
+          {/* srnka (doe) – same silhouette, no antlers, walking the other way */}
+          <Deer top="76%" duration={38} size={0.85} delay={7} flip tone="#1c2c1f" antlers={false} />
+          {/* liška (fox), trotting past a little quicker than the deer */}
+          <Fox top="74%" duration={21} size={1} delay={3} />
+          <Fox top="78%" duration={26} size={0.7} delay={16} flip tone="#2e1a0e" />
         </>
       )}
 
