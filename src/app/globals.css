@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+:root {
+  --background: #faf7f2;
+  --foreground: #23291f;
+  --forest: #2f4a3c;
+  --forest-dark: #1d2f26;
+  --wood: #8a5a3b;
+  --wood-light: #c98f5e;
+  --cream: #faf7f2;
+  --stone: #6b6459;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-forest: var(--forest);
+  --color-forest-dark: var(--forest-dark);
+  --color-wood: var(--wood);
+  --color-wood-light: var(--wood-light);
+  --color-cream: var(--cream);
+  --color-stone: var(--stone);
+  --font-sans: "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial,
+    sans-serif;
+  --font-display: "Iowan Old Style", Georgia, "Times New Roman", serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+}
+
+::selection {
+  background: var(--wood-light);
+  color: white;
+}
+
+.section-heading {
+  position: relative;
+  display: inline-block;
+}
+
+.section-heading::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -0.5rem;
+  height: 3px;
+  width: 3.5rem;
+  background: var(--wood-light);
+  border-radius: 2px;
+}
+
+.rdp-root {
+  --rdp-accent-color: var(--forest) !important;
+  --rdp-today-color: var(--wood) !important;
+}
