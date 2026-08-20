@@ -3,24 +3,14 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowDown, CalendarCheck } from "lucide-react";
+import ForestScene from "./ForestScene";
 
 export default function Hero() {
   return (
     <section className="relative flex min-h-[92vh] items-center overflow-hidden bg-forest-dark text-cream">
-      {/* Placeholder "photo" backdrop – swap for a real photo of the cottage */}
-      <div
-        aria-hidden
-        className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(201,143,94,0.35),transparent_45%),radial-gradient(circle_at_80%_0%,rgba(47,74,60,0.6),transparent_40%),linear-gradient(160deg,#1d2f26,#2f4a3c_55%,#3c5745)]"
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0 opacity-[0.15] mix-blend-overlay"
-        style={{
-          backgroundImage:
-            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cpath d='M0 0h120v120H0z' fill='none'/%3E%3Cpath d='M20 100 L60 20 L100 100 Z' stroke='%23ffffff' stroke-width='1' fill='none'/%3E%3C/svg%3E\")",
-          backgroundSize: "120px 120px",
-        }}
-      />
+      {/* Animated forest + river backdrop with deer walking by the water.
+          No photo needed – swap for a real photo later if you prefer. */}
+      <ForestScene />
 
       <div className="relative mx-auto flex max-w-6xl flex-col items-start gap-6 px-5 py-32">
         <motion.span
