@@ -20,6 +20,31 @@ function rand(seed: number, min: number, max: number) {
   return min + (v - Math.floor(v)) * (max - min);
 }
 
+// Builds one smoothly-tapered, gently bent leg silhouette (hip → knee →
+// hoof) using rounded quadratic curves instead of straight segments, so legs
+// read as an organic limb rather than a sharp-edged polygon.
+function legPath(
+  topX: number,
+  topY: number,
+  topW: number,
+  kneeX: number,
+  kneeY: number,
+  kneeW: number,
+  hoofX: number,
+  hoofY: number,
+  hoofW: number
+) {
+  const midTop = (topY + kneeY) / 2;
+  const midBottom = (kneeY + hoofY) / 2;
+  return `M${topX - topW / 2} ${topY}
+    Q${topX - topW / 2 - 2} ${midTop} ${kneeX - kneeW / 2} ${kneeY}
+    Q${kneeX - kneeW / 2 - 1} ${midBottom} ${hoofX - hoofW / 2} ${hoofY}
+    L${hoofX + hoofW / 2} ${hoofY}
+    Q${kneeX + kneeW / 2 + 1} ${midBottom} ${kneeX + kneeW / 2} ${kneeY}
+    Q${topX + topW / 2 + 2} ${midTop} ${topX + topW / 2} ${topY}
+    Z`;
+}
+
 function TreeLine({
   seedOffset,
   count,
@@ -121,13 +146,12 @@ function Deer({
         aria-hidden
       >
         <g fill={tone}>
-          {/* four legs, drawn as simple tapered shapes with a bend at the
-              knee, and overlapping generously up into the body so there is
-              no visible seam where they attach */}
-          <path d="M64 78 L76 78 L72 98 L78 128 L68 128 L60 102 Z" />
-          <path d="M84 82 L96 82 L91 100 L88 128 L78 128 L82 104 Z" />
-          <path d="M132 78 L144 78 L148 98 L154 128 L144 128 L138 102 Z" />
-          <path d="M152 74 L164 74 L170 96 L176 128 L166 128 L158 100 Z" />
+          {/* four legs – smoothly tapered from hip to hoof with a gentle
+              bend at the knee/hock, overlapping generously into the body */}
+          <path d={legPath(68, 80, 13, 63, 104, 7, 61, 128, 5)} />
+          <path d={legPath(88, 84, 12, 87, 106, 6.5, 84, 128, 5)} />
+          <path d={legPath(138, 78, 12, 142, 104, 6.5, 146, 128, 5)} />
+          <path d={legPath(158, 75, 12, 165, 102, 6.5, 171, 128, 5)} />
 
           {/* smooth, simplified body – a single clean silhouette reads far
               more naturally than many small overlapping bumps */}
@@ -219,11 +243,12 @@ function Fox({
         aria-hidden
       >
         <g fill={tone}>
-          {/* four simple tapered legs, overlapping up into the body */}
-          <path d="M40 58 L50 58 L47 72 L44 90 L34 90 L38 74 Z" />
-          <path d="M54 60 L64 60 L60 74 L57 90 L47 90 L51 76 Z" />
-          <path d="M96 55 L106 55 L110 70 L115 90 L105 90 L100 74 Z" />
-          <path d="M110 53 L120 53 L125 68 L131 88 L121 88 L114 72 Z" />
+          {/* four legs, smoothly tapered with a gentle knee bend rather
+              than sharp polygon corners, overlapping up into the body */}
+          <path d={legPath(44, 57, 10, 41, 72, 5.5, 39, 90, 4)} />
+          <path d={legPath(57, 61, 9, 55, 74, 5, 53, 90, 4)} />
+          <path d={legPath(101, 53, 10, 106, 70, 5.5, 110, 89, 4)} />
+          <path d={legPath(115, 51, 10, 121, 68, 5.5, 126, 88, 4)} />
 
           {/* smooth, simplified low-slung body */}
           <path
@@ -400,10 +425,19 @@ export default function ForestScene() {
         </>
       )}
 
-      {/* water, with a soft mirrored reflection of the tree line + shimmer */}
-      <div className="absolute inset-x-0 bottom-0 h-[17%] overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,#0f1c15,#081310)]" />
-        <div className="absolute inset-x-0 top-0 h-full scale-y-[-1] opacity-25 blur-[2px]">
+      {/* a calm stream along the bottom edge – soft-edged (no hard band),
+          a believable teal-blue so it reads as water rather than a stripe
+          of forest-green, with a blurred tree reflection and gentle ripples
+          instead of a hard animated diagonal pattern */}
+      <div
+        className="absolute inset-x-0 bottom-0 h-[16%] overflow-hidden"
+        style={{
+          maskImage: "linear-gradient(to bottom, transparent, black 35%)",
+          WebkitMaskImage: "linear-gradient(to bottom, transparent, black 35%)",
+        }}
+      >
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,#173229,#0c1f22_55%,#081619)]" />
+        <div className="absolute inset-x-0 top-0 h-full scale-y-[-1] opacity-20 blur-[3px]">
           <TreeLine
             seedOffset={97}
             count={9}
@@ -413,15 +447,40 @@ export default function ForestScene() {
             canopyColor="#182b1e"
           />
         </div>
+        {/* gentle, slow-drifting ripples – soft curved highlights rather
+            than a hard repeating pattern */}
+        <svg
+          className="absolute inset-x-0 bottom-0 w-full opacity-40"
+          viewBox="0 0 400 60"
+          preserveAspectRatio="none"
+          height="100%"
+        >
+          {[14, 28, 44].map((y, i) => (
+            <motion.path
+              key={y}
+              d={`M-50 ${y} Q0 ${y - 4} 50 ${y} T150 ${y} T250 ${y} T350 ${y} T450 ${y}`}
+              stroke="rgba(201,201,168,0.35)"
+              strokeWidth="1.4"
+              fill="none"
+              initial={{ x: 0 }}
+              animate={{ x: [-80, 0] }}
+              transition={{
+                duration: 10 + i * 3,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+            />
+          ))}
+        </svg>
+        {/* soft warm sun-glint drifting across the water */}
         <motion.div
-          className="absolute inset-0 opacity-35"
+          className="absolute inset-y-0 w-1/3 opacity-30 blur-md"
           style={{
-            backgroundImage:
-              "repeating-linear-gradient(100deg, rgba(230,168,101,0.3) 0px, rgba(230,168,101,0.3) 2px, transparent 2px, transparent 40px)",
-            backgroundSize: "200% 100%",
+            background:
+              "linear-gradient(90deg, transparent, rgba(230,168,101,0.5), transparent)",
           }}
-          animate={{ backgroundPositionX: ["0%", "100%"] }}
-          transition={{ duration: 9, repeat: Infinity, ease: "linear" }}
+          animate={{ x: ["-40%", "140%"] }}
+          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
         />
       </div>
 
