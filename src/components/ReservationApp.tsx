@@ -6,6 +6,7 @@ import "react-day-picker/style.css";
 import { format, addDays } from "date-fns";
 import { cs } from "date-fns/locale";
 import { CalendarCheck, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import Confetti from "./Confetti";
 
 type BookedRange = { id: string; startDate: string; endDate: string };
 
@@ -40,6 +41,7 @@ export default function ReservationApp() {
     | { type: "error"; message: string }
     | null
   >(null);
+  const [celebrate, setCelebrate] = useState(0);
 
   useEffect(() => {
     fetch("/api/reservations")
@@ -93,6 +95,7 @@ export default function ReservationApp() {
         ]);
         setRange(undefined);
         setForm({ name: "", email: "", phone: "", guests: 2, note: "" });
+        setCelebrate((c) => c + 1);
       }
     } catch {
       setResult({ type: "error", message: "Nepodařilo se odeslat žádost. Zkuste to prosím znovu." });
@@ -228,19 +231,24 @@ export default function ReservationApp() {
           </button>
 
           {result && (
-            <div
-              className={`flex items-start gap-2 rounded-lg px-4 py-3 text-sm ${
-                result.type === "success"
-                  ? "bg-forest/10 text-forest-dark"
-                  : "bg-red-50 text-red-700"
-              }`}
-            >
-              {result.type === "success" ? (
-                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
-              ) : (
-                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+            <div className="relative">
+              {result.type === "success" && celebrate > 0 && (
+                <Confetti seed={celebrate} />
               )}
-              {result.message}
+              <div
+                className={`flex items-start gap-2 rounded-lg px-4 py-3 text-sm ${
+                  result.type === "success"
+                    ? "bg-forest/10 text-forest-dark"
+                    : "bg-red-50 text-red-700"
+                }`}
+              >
+                {result.type === "success" ? (
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+                ) : (
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                )}
+                {result.message}
+              </div>
             </div>
           )}
         </form>

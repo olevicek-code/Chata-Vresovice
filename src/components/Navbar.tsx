@@ -5,21 +5,46 @@ import { useEffect, useState } from "react";
 import { Menu, X, TreePine } from "lucide-react";
 
 const HOME_LINKS = [
-  { href: "/#o-chate", label: "O chatě" },
-  { href: "/#okoli", label: "Okolí" },
-  { href: "/#galerie", label: "Galerie" },
-  { href: "/#kontakt", label: "Kontakt" },
+  { href: "/#o-chate", label: "O chatě", id: "o-chate" },
+  { href: "/#historie", label: "Historie", id: "historie" },
+  { href: "/#okoli", label: "Okolí", id: "okoli" },
+  { href: "/#galerie", label: "Galerie", id: "galerie" },
+  { href: "/#faq", label: "FAQ", id: "faq" },
+  { href: "/#kontakt", label: "Kontakt", id: "kontakt" },
 ];
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [active, setActive] = useState<string | null>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
     onScroll();
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const sections = HOME_LINKS.map((l) =>
+      document.getElementById(l.id)
+    ).filter((el): el is HTMLElement => Boolean(el));
+
+    if (sections.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActive(entry.target.id);
+          }
+        });
+      },
+      { rootMargin: "-40% 0px -50% 0px", threshold: 0 }
+    );
+
+    sections.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
   }, []);
 
   const closeMenu = () => setOpen(false);
@@ -41,14 +66,19 @@ export default function Navbar() {
           Chata Vřesovice
         </Link>
 
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav className="hidden items-center gap-7 md:flex">
           {HOME_LINKS.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-stone transition-colors hover:text-forest-dark"
+              className={`relative text-sm font-medium transition-colors hover:text-forest-dark ${
+                active === link.id ? "text-forest-dark" : "text-stone"
+              }`}
             >
               {link.label}
+              {active === link.id && (
+                <span className="absolute -bottom-1.5 left-0 h-[2px] w-full rounded-full bg-wood-light" />
+              )}
             </Link>
           ))}
           <Link
@@ -80,7 +110,9 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 onClick={closeMenu}
-                className="text-sm font-medium text-stone hover:text-forest-dark"
+                className={`text-sm font-medium hover:text-forest-dark ${
+                  active === link.id ? "text-forest-dark" : "text-stone"
+                }`}
               >
                 {link.label}
               </Link>
