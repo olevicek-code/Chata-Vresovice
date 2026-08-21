@@ -59,14 +59,6 @@ function TreeLine({
         const tierH = t.h * 0.34;
         return (
           <g key={i}>
-            {/* trunk sliver */}
-            <rect
-              x={t.cx - t.w * 0.04}
-              y={top + t.h * 0.55}
-              width={t.w * 0.08}
-              height={t.h * 0.5}
-              fill={color}
-            />
             {/* three stacked conifer tiers – pointed apex, gently concave
                 sides, widening toward the base for a classic pine silhouette */}
             {[0, 1, 2].map((tier) => {
@@ -129,64 +121,58 @@ function Deer({
         aria-hidden
       >
         <g fill={tone}>
-          {/* hind leg (back) */}
-          <path d="M70 96 C66 106 60 112 55 124 C58 126 63 126 65 123 C70 113 74 104 78 97 Z" />
-          {/* front leg (back) */}
-          <path d="M148 94 C150 105 146 113 141 125 C144 127 149 127 151 124 C156 112 158 102 157 93 Z" />
-          {/* hind leg (front) */}
-          <path d="M84 98 C82 109 79 116 76 126 C79 128 84 128 86 125 C90 114 92 105 93 97 Z" />
-          {/* front leg (front) */}
-          <path d="M162 92 C166 103 165 112 163 124 C166 126 171 126 173 123 C176 111 176 101 173 91 Z" />
+          {/* four legs, drawn as simple tapered shapes with a bend at the
+              knee, and overlapping generously up into the body so there is
+              no visible seam where they attach */}
+          <path d="M64 78 L76 78 L72 98 L78 128 L68 128 L60 102 Z" />
+          <path d="M84 82 L96 82 L91 100 L88 128 L78 128 L82 104 Z" />
+          <path d="M132 78 L144 78 L148 98 L154 128 L144 128 L138 102 Z" />
+          <path d="M152 74 L164 74 L170 96 L176 128 L166 128 L158 100 Z" />
 
-          {/* tail */}
-          <path d="M60 68 C52 68 47 72 45 78 C50 79 56 77 61 73 Z" />
-
-          {/* body */}
+          {/* smooth, simplified body – a single clean silhouette reads far
+              more naturally than many small overlapping bumps */}
           <path
-            d="M58 78
-               C46 74 40 64 44 54
-               C48 45 62 40 78 41
-               C96 42 112 47 124 55
-               C134 50 146 46 156 47
-               C164 48 168 53 166 58
-               C171 59 176 62 177 67
-               C177 71 172 73 166 72
-               C168 78 166 84 160 87
-               C165 89 168 93 166 97
-               C160 99 152 96 148 91
-               C138 96 122 98 108 96
-               C104 100 96 101 90 98
-               C78 100 66 97 58 90
-               C52 88 50 83 58 78 Z"
+            d="M52 82
+               C40 79 34 68 39 58
+               C45 47 63 41 86 41
+               C112 41 136 47 150 58
+               C154 61 154 66 148 68
+               C152 71 153 76 148 80
+               C136 87 108 90 82 89
+               C68 89 58 87 52 82 Z"
           />
 
-          {/* neck + head, held slightly low as if grazing/walking */}
+          {/* neck + head, overlapping deep into the shoulder so it reads as
+              one continuous animal rather than a glued-on piece */}
           <path
-            d="M150 55
-               C158 46 166 36 172 27
-               C174 24 178 23 180 26
-               C182 29 180 33 177 36
-               C182 35 187 37 188 41
-               C189 45 185 48 180 47
-               C183 51 182 56 178 58
-               C173 61 168 59 166 55
-               C161 61 155 63 150 60 Z"
+            d="M118 60
+               C128 48 142 34 158 24
+               C162 21 168 21 170 25
+               C172 29 169 33 165 36
+               C170 36 174 40 173 44
+               C172 48 167 50 162 48
+               C164 53 162 58 156 60
+               C148 63 140 60 134 54
+               C127 60 122 63 118 60 Z"
           />
 
           {/* muzzle */}
-          <path d="M178 26 C183 22 189 21 193 24 C195 27 192 31 187 32 C183 33 179 30 178 26 Z" />
+          <path d="M160 25 C167 20 176 19 181 23 C183 27 179 31 173 32 C167 33 162 29 160 25 Z" />
 
           {/* ear */}
-          <path d="M166 30 C170 24 176 22 180 25 C177 30 172 32 166 30 Z" />
+          <path d="M144 29 C147 20 155 15 163 16 C159 23 152 28 144 29 Z" />
+
+          {/* short white-tipped tail flag at the rump */}
+          <path d="M46 60 C38 58 32 61 30 67 C36 69 43 67 48 62 Z" />
 
           {/* antlers – a few elegant branching tines (bucks only; does go
               without, which also reads correctly for a roe deer/srnka) */}
           {antlers && (
             <path
-              d="M181 22 C180 12 176 4 170 -2 M181 22 C184 12 189 6 196 3
-                 M183 15 C187 10 192 8 197 9 M178 16 C174 10 168 7 162 8"
+              d="M166 20 C165 9 160 0 152 -7 M166 20 C170 9 177 2 186 -2
+                 M168 12 C173 6 180 3 186 4 M162 13 C157 6 149 3 142 4"
               stroke={tone}
-              strokeWidth="2.6"
+              strokeWidth="2.8"
               strokeLinecap="round"
               fill="none"
             />
@@ -233,54 +219,49 @@ function Fox({
         aria-hidden
       >
         <g fill={tone}>
-          {/* bushy tail, curling up behind */}
-          <path d="M46 58 C30 56 16 48 14 34 C13 24 19 16 28 16 C24 26 26 38 34 46 C38 50 42 54 46 58 Z" />
+          {/* four simple tapered legs, overlapping up into the body */}
+          <path d="M40 58 L50 58 L47 72 L44 90 L34 90 L38 74 Z" />
+          <path d="M54 60 L64 60 L60 74 L57 90 L47 90 L51 76 Z" />
+          <path d="M96 55 L106 55 L110 70 L115 90 L105 90 L100 74 Z" />
+          <path d="M110 53 L120 53 L125 68 L131 88 L121 88 L114 72 Z" />
 
-          {/* hind leg (back) */}
-          <path d="M54 66 C51 74 47 79 42 88 C45 90 49 90 51 87 C55 79 58 72 60 66 Z" />
-          {/* hind leg (front) */}
-          <path d="M66 68 C64 76 62 81 59 89 C62 91 66 91 68 88 C71 80 72 73 73 67 Z" />
-          {/* front leg (back) */}
-          <path d="M108 64 C110 73 107 79 103 88 C106 90 110 90 112 87 C116 78 117 71 116 63 Z" />
-          {/* front leg (front) */}
-          <path d="M120 62 C124 71 123 78 121 87 C124 89 128 89 130 86 C133 77 132 69 129 61 Z" />
-
-          {/* low, elongated body */}
+          {/* smooth, simplified low-slung body */}
           <path
-            d="M40 60
-               C28 58 20 51 21 43
-               C22 36 32 32 44 33
-               C58 34 72 39 83 46
-               C92 42 102 40 110 42
-               C116 44 118 49 114 52
-               C119 53 122 57 120 61
-               C116 64 109 62 105 58
-               C96 63 84 65 72 63
-               C66 66 56 66 48 63
-               C44 65 40 63 40 60 Z"
+            d="M30 55
+               C21 53 15 47 17 40
+               C19 33 30 30 44 31
+               C60 32 76 37 90 45
+               C97 41 105 40 111 42
+               C115 44 115 49 110 51
+               C115 53 116 57 111 60
+               C101 65 82 65 65 61
+               C52 64 40 63 30 55 Z"
           />
 
-          {/* head + pointed snout, held forward and slightly down */}
+          {/* head + pointed snout, overlapping deep into the body */}
           <path
-            d="M104 42
-               C112 36 121 31 129 28
-               C133 27 137 29 136 33
-               C135 36 130 38 126 39
-               C130 40 132 43 130 46
-               C127 49 121 48 117 45
-               C112 49 106 49 102 46 Z"
+            d="M84 44
+               C95 37 106 31 117 27
+               C121 25 126 27 125 31
+               C124 35 119 37 114 38
+               C118 39 120 43 117 46
+               C113 50 106 49 101 45
+               C95 49 89 47 84 44 Z"
           />
 
           {/* pointed ear */}
-          <path d="M114 30 C115 23 119 17 125 15 C124 22 122 28 118 32 Z" />
-        </g>
+          <path d="M104 30 C106 22 113 16 121 16 C118 23 112 28 104 30 Z" />
 
-        {/* lighter belly/chest marking, typical of a red fox, for extra charm */}
-        <path
-          d="M50 55 C58 58 68 60 78 58 C74 62 64 63 55 61 C52 60 50 58 50 55 Z"
-          fill="#c98f5e"
-          fillOpacity={0.35}
-        />
+          {/* bushy tail, curling up behind and overlapping into the rump */}
+          <path d="M38 52 C22 51 9 43 8 30 C7 21 14 14 23 15 C18 24 20 35 28 43 C32 47 35 50 38 52 Z" />
+
+          {/* lighter belly/chest marking, typical of a red fox */}
+          <path
+            d="M34 50 C43 54 54 56 64 54 C59 58 48 58 39 56 C36 55 34 53 34 50 Z"
+            fill="#c98f5e"
+            fillOpacity={0.4}
+          />
+        </g>
       </motion.svg>
     </motion.div>
   );
