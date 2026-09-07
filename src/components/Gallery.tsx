@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { X, ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
 import AnimatedSection from "./AnimatedSection";
 import TiltCard from "./TiltCard";
@@ -63,15 +62,14 @@ export default function Gallery() {
         </div>
       </div>
 
-      <AnimatePresence>
+      <div
+        className={`fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-6 transition-opacity duration-200 ${
+          activeIndex !== null ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+        onClick={close}
+      >
         {activeIndex !== null && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-6"
-            onClick={close}
-          >
+          <>
             <button
               aria-label="Zavřít"
               className="absolute right-6 top-6 text-cream/80 hover:text-cream"
@@ -91,9 +89,7 @@ export default function Gallery() {
               <ChevronLeft className="h-9 w-9" />
             </button>
 
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
+            <div
               onClick={(e) => e.stopPropagation()}
               className={`flex aspect-[4/3] w-full max-w-xl flex-col items-center justify-center gap-3 rounded-2xl bg-gradient-to-br ${PLACEHOLDER_IMAGES[activeIndex].gradient} text-center`}
             >
@@ -101,7 +97,7 @@ export default function Gallery() {
               <p className="font-medium text-forest-dark/90">
                 {PLACEHOLDER_IMAGES[activeIndex].label}
               </p>
-            </motion.div>
+            </div>
 
             <button
               aria-label="Další"
@@ -113,9 +109,9 @@ export default function Gallery() {
             >
               <ChevronRight className="h-9 w-9" />
             </button>
-          </motion.div>
+          </>
         )}
-      </AnimatePresence>
+      </div>
     </section>
   );
 }

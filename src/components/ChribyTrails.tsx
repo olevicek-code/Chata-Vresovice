@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, MapPin } from "lucide-react";
 import AttractionMap from "./AttractionMap";
 
@@ -198,14 +197,13 @@ export default function ChribyTrails() {
                   }`}
                 />
               </button>
-              <AnimatePresence initial={false}>
-                {isOpen && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.18 }}
-                  >
+              <div
+                className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${
+                  isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                }`}
+              >
+                <div className="overflow-hidden">
+                  {isOpen && (
                     <div className="px-5 pb-5 pl-16">
                       <p className="text-sm leading-relaxed text-stone">
                         {point.why}
@@ -220,9 +218,9 @@ export default function ChribyTrails() {
                         </span>
                       )}
                     </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                  )}
+                </div>
+              </div>
             </div>
           );
         })}

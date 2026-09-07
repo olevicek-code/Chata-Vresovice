@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Mountain,
   Waves,
@@ -152,91 +152,83 @@ export default function AttractionsExplorer() {
       </div>
 
       <motion.div layout className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <AnimatePresence mode="popLayout">
-          {filtered.map((a) => {
-            const Icon = ICONS[a.category];
-            return (
-              <motion.button
-                key={a.title}
-                layout
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                whileHover={{ y: -4 }}
-                onClick={() => setSelected(a)}
-                className="h-full rounded-2xl bg-background p-6 text-left shadow-sm ring-1 ring-black/5 transition-shadow hover:shadow-md"
-              >
-                <Icon className="h-8 w-8 text-forest" />
-                <h3 className="mt-4 font-display text-lg text-forest-dark">
-                  {a.title}
-                </h3>
-                <p className="mt-1 flex items-center gap-1 text-xs font-medium text-wood">
-                  <MapPin className="h-3.5 w-3.5" />
-                  {a.distance}
-                </p>
-                <p className="mt-2 text-sm leading-relaxed text-stone">
-                  {a.short}
-                </p>
-                <span className="mt-3 inline-block text-xs font-semibold text-forest underline-offset-2 hover:underline">
-                  Zobrazit více
-                </span>
-              </motion.button>
-            );
-          })}
-        </AnimatePresence>
-      </motion.div>
-
-      <AnimatePresence>
-        {selected && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-6"
-            onClick={() => setSelected(null)}
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              onClick={(e) => e.stopPropagation()}
-              className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-background p-8 shadow-xl"
+        {filtered.map((a) => {
+          const Icon = ICONS[a.category];
+          return (
+            <motion.button
+              key={a.title}
+              layout
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              whileHover={{ y: -4 }}
+              onClick={() => setSelected(a)}
+              className="h-full rounded-2xl bg-background p-6 text-left shadow-sm ring-1 ring-black/5 transition-shadow hover:shadow-md"
             >
-              <button
-                aria-label="Zavřít"
-                onClick={() => setSelected(null)}
-                className="absolute right-4 top-4 z-10 text-stone hover:text-forest-dark"
-              >
-                <X className="h-5 w-5" />
-              </button>
-              <Trees className="h-8 w-8 text-forest" />
-              <h3 className="mt-3 font-display text-2xl text-forest-dark">
-                {selected.title}
+              <Icon className="h-8 w-8 text-forest" />
+              <h3 className="mt-4 font-display text-lg text-forest-dark">
+                {a.title}
               </h3>
               <p className="mt-1 flex items-center gap-1 text-xs font-medium text-wood">
                 <MapPin className="h-3.5 w-3.5" />
-                {selected.distance}
+                {a.distance}
               </p>
-
-              <div className="mt-4">
-                <AttractionMap
-                  lat={selected.lat}
-                  lon={selected.lon}
-                  label={selected.title}
-                />
-                {selected.approx && (
-                  <p className="mt-1.5 text-xs text-stone/60">
-                    Poloha na mapě je orientační (přibližný střed oblasti).
-                  </p>
-                )}
-              </div>
-
-              <p className="mt-4 text-sm leading-relaxed text-stone">
-                {selected.long}
+              <p className="mt-2 text-sm leading-relaxed text-stone">
+                {a.short}
               </p>
-            </motion.div>
-          </motion.div>
+              <span className="mt-3 inline-block text-xs font-semibold text-forest underline-offset-2 hover:underline">
+                Zobrazit více
+              </span>
+            </motion.button>
+          );
+        })}
+      </motion.div>
+
+      <div
+        className={`fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-6 transition-opacity duration-200 ${
+          selected ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+        onClick={() => setSelected(null)}
+      >
+        {selected && (
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-background p-8 shadow-xl"
+          >
+            <button
+              aria-label="Zavřít"
+              onClick={() => setSelected(null)}
+              className="absolute right-4 top-4 z-10 text-stone hover:text-forest-dark"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <Trees className="h-8 w-8 text-forest" />
+            <h3 className="mt-3 font-display text-2xl text-forest-dark">
+              {selected.title}
+            </h3>
+            <p className="mt-1 flex items-center gap-1 text-xs font-medium text-wood">
+              <MapPin className="h-3.5 w-3.5" />
+              {selected.distance}
+            </p>
+
+            <div className="mt-4">
+              <AttractionMap
+                lat={selected.lat}
+                lon={selected.lon}
+                label={selected.title}
+              />
+              {selected.approx && (
+                <p className="mt-1.5 text-xs text-stone/60">
+                  Poloha na mapě je orientační (přibližný střed oblasti).
+                </p>
+              )}
+            </div>
+
+            <p className="mt-4 text-sm leading-relaxed text-stone">
+              {selected.long}
+            </p>
+          </div>
         )}
-      </AnimatePresence>
+      </div>
     </div>
   );
 }
