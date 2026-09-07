@@ -1,9 +1,9 @@
 /**
- * Shared helpers for the small Leaflet maps used around the site
- * (AttractionMap, RegionMap). Leaflet itself is loaded from a CDN script
- * tag rather than installed as an npm dependency, so this file also
- * declares the minimal slice of its API these components actually use –
- * not the real `leaflet` types.
+ * Shared helpers for the small per-place Leaflet maps used around the
+ * site (AttractionMap). Leaflet itself is loaded from a CDN script tag
+ * rather than installed as an npm dependency, so this file also declares
+ * the minimal slice of its API these components actually use – not the
+ * real `leaflet` types.
  */
 
 export type LatLngTuple = [number, number];
@@ -11,14 +11,10 @@ export type LatLngTuple = [number, number];
 export interface LeafletLayer {
   addTo: (map: LeafletMapInstance) => LeafletLayer;
   bindPopup?: (html: string) => LeafletLayer;
-  openPopup?: () => LeafletLayer;
-  setLatLng?: (latlng: LatLngTuple) => LeafletLayer;
 }
 export interface LeafletMapInstance {
   remove: () => void;
   fitBounds: (bounds: LatLngTuple[], options?: Record<string, unknown>) => void;
-  panTo: (latlng: LatLngTuple, options?: Record<string, unknown>) => void;
-  setView: (latlng: LatLngTuple, zoom: number) => void;
 }
 export interface LeafletStatic {
   map: (el: HTMLElement, options?: Record<string, unknown>) => LeafletMapInstance;

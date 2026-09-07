@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, MapPin } from "lucide-react";
-import RegionMap from "./RegionMap";
+import AttractionMap from "./AttractionMap";
 
 type TrailPoint = {
   title: string;
@@ -207,25 +207,26 @@ export default function ChribyTrails() {
                     transition={{ duration: 0.25, ease: "easeInOut" }}
                     className="overflow-hidden"
                   >
-                    <p className="px-5 pb-4 pl-16 text-sm leading-relaxed text-stone">
-                      {point.why}
+                    <div className="px-5 pb-5 pl-16">
+                      <p className="text-sm leading-relaxed text-stone">
+                        {point.why}
+                      </p>
+                      <div className="mt-3">
+                        <AttractionMap lat={point.lat} lon={point.lon} label={point.title} />
+                      </div>
                       {point.approx && (
-                        <span className="mt-1 flex items-center gap-1 text-xs text-stone/50">
+                        <span className="mt-1.5 flex items-center gap-1 text-xs text-stone/50">
                           <MapPin className="h-3 w-3" />
                           Poloha na mapě je orientační.
                         </span>
                       )}
-                    </p>
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
           );
         })}
-      </div>
-
-      <div className="mt-6">
-        <RegionMap points={POINTS} activeIndex={activeIndex} />
       </div>
     </div>
   );
