@@ -163,11 +163,13 @@ export default function AttractionMap({
         const bearing = bearingDeg(CHATA, { lat, lon });
         const mid: LatLngTuple = [(CHATA.lat + lat) / 2, (CHATA.lon + lon) / 2];
 
+        const arrowSvg = `<svg width="10" height="10" viewBox="0 0 10 10" style="display:block;transform:rotate(${(bearing - 90).toFixed(1)}deg)" xmlns="http://www.w3.org/2000/svg"><path d="M0 2 L10 5 L0 8 Z" fill="#c98f5e"/></svg>`;
+
         L.marker(mid, {
           icon: L.divIcon({
             className: "",
             html: `<div class="flex items-center gap-1.5 whitespace-nowrap rounded-full bg-forest-dark px-3 py-1 text-xs font-semibold text-cream shadow-lg ring-1 ring-cream/20">
-                     <span style="display:inline-block;transform:rotate(${(bearing - 90).toFixed(1)}deg)">&#10148;</span>
+                     ${arrowSvg}
                      ${distanceKm.toFixed(1)} km vzdušnou čarou
                    </div>`,
             iconSize: [0, 0],
