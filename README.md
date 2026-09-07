@@ -14,6 +14,22 @@ Prezentační a rezervační web pro chatu Vřesovice, postavený na
   `POST` přijme novou žádost o rezervaci a ověří, že se nepřekrývá s
   existující rezervací.
 
+## Video na úvodní stránce
+
+Hero sekce (`src/components/VideoScene.tsx`) používá 4 volně použitelná
+videa z [Pexels](https://www.pexels.com) (Pexels License – zdarma pro
+komerční i nekomerční použití, bez nutnosti uvádět autora), uložená v
+`public/videos/`:
+
+- `hills.mp4` – [pexels.com/video/15070555](https://www.pexels.com/video/drone-footage-of-green-trees-15070555/)
+- `deer.mp4` – [pexels.com/video/8553227](https://www.pexels.com/video/a-deer-grazing-at-sequoia-national-park-8553227/)
+- `fawn.mp4` – [pexels.com/video/9422693](https://www.pexels.com/video/a-deer-in-a-forest-9422693/)
+- `birds.mp4` – [pexels.com/video/28588755](https://www.pexels.com/video/serene-forest-landscape-with-flying-birds-28588755/)
+
+Až budete mít vlastní záběry z okolí chaty, stačí nahradit soubory ve
+stejném formátu (H.264 MP4, cca 1280×720) a případně upravit pořadí/délku
+přehrávání v `PLAYLIST` v `VideoScene.tsx`.
+
 ## Placeholder obsah
 
 Web je zatím naplněn ukázkovým textem a barevnými zástupnými "fotkami"

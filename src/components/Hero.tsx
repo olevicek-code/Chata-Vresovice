@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { motion, type Variants } from "framer-motion";
 import { ArrowDown, CalendarCheck, ChevronDown } from "lucide-react";
-import ForestScene from "./ForestScene";
+import VideoScene from "./VideoScene";
 import MagneticButton from "./MagneticButton";
 import TechHud from "./TechHud";
 
@@ -25,9 +25,8 @@ const item: Variants = {
 export default function Hero() {
   return (
     <section className="relative flex min-h-[92vh] items-center overflow-hidden bg-forest-dark text-cream">
-      {/* Animated forest + river backdrop with deer walking by the water.
-          No photo needed – swap for a real photo later if you prefer. */}
-      <ForestScene />
+      {/* Real, cross-fading forest/wildlife footage backdrop */}
+      <VideoScene />
 
       {/* soft drifting aurora glow behind the headline – ties the "signal"
           accent into the hero without touching the forest illustration */}

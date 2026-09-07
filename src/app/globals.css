@@ -85,6 +85,15 @@ body {
   box-shadow: 0 0 32px -8px color-mix(in srgb, var(--signal) 55%, transparent);
 }
 
+@keyframes ken-burns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.08);
+  }
+}
+
 @keyframes contour-drift {
   from {
     stroke-dashoffset: 0;
