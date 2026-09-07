@@ -113,8 +113,10 @@ body {
   border-radius: 9999px;
   background: var(--signal);
   pointer-events: none;
+  opacity: 0;
   transform: translate(var(--x, -100px), var(--y, -100px)) translate(-50%, -50%);
   box-shadow: 0 0 8px 2px color-mix(in srgb, var(--signal) 70%, transparent);
+  transition: opacity 0.3s ease;
 }
 
 .cursor-ring {
@@ -127,10 +129,16 @@ body {
   border-radius: 9999px;
   border: 1px solid color-mix(in srgb, var(--signal) 55%, transparent);
   pointer-events: none;
+  opacity: 0;
   transform: translate(var(--x, -100px), var(--y, -100px)) translate(-50%, -50%)
     scale(1);
   transition: transform 0.15s ease-out, background 0.2s ease,
-    border-color 0.2s ease;
+    border-color 0.2s ease, opacity 0.3s ease;
+}
+
+.cursor-dot.cursor-visible,
+.cursor-ring.cursor-visible {
+  opacity: 1;
 }
 
 .cursor-ring--active {

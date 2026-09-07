@@ -34,6 +34,10 @@ export default function CustomCursor() {
       targetY = e.clientY;
       dotRef.current?.style.setProperty("--x", `${targetX}px`);
       dotRef.current?.style.setProperty("--y", `${targetY}px`);
+      // only reveal once we know a real cursor position, so it never
+      // flashes at the viewport center before the mouse has moved
+      dotRef.current?.classList.add("cursor-visible");
+      ringRef.current?.classList.add("cursor-visible");
     }
 
     function onOver(e: MouseEvent) {

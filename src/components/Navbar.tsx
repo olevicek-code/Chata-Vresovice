@@ -61,11 +61,9 @@ export default function Navbar() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
         <Link
           href="/"
-          className={`flex items-center gap-2 font-display text-lg font-medium transition-colors ${
-            scrolled ? "text-forest-dark" : "text-cream"
-          }`}
+          className="flex items-center gap-2 font-display text-lg font-medium text-forest-dark"
         >
-          <TreePine className={`h-6 w-6 ${scrolled ? "text-forest" : "text-signal"}`} />
+          <TreePine className="h-6 w-6 text-forest" />
           Chata Vřesovice
         </Link>
 
@@ -75,14 +73,8 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`relative text-sm font-medium transition-colors ${
-                  scrolled
-                    ? active === link.id
-                      ? "text-forest-dark"
-                      : "text-stone hover:text-forest-dark"
-                    : active === link.id
-                      ? "text-cream"
-                      : "text-cream/75 hover:text-cream"
+                className={`relative text-sm font-medium transition-colors hover:text-forest-dark ${
+                  active === link.id ? "text-forest-dark" : "text-stone"
                 }`}
               >
                 {link.label}
@@ -99,7 +91,7 @@ export default function Navbar() {
             </Link>
           </nav>
 
-          <div className={scrolled ? "text-forest-dark" : "text-cream"}>
+          <div className="text-forest-dark">
             <AmbientSound />
           </div>
 
@@ -109,9 +101,9 @@ export default function Navbar() {
             onClick={() => setOpen((v) => !v)}
           >
             {open ? (
-              <X className={`h-6 w-6 ${scrolled ? "text-forest-dark" : "text-cream"}`} />
+              <X className="h-6 w-6 text-forest-dark" />
             ) : (
-              <Menu className={`h-6 w-6 ${scrolled ? "text-forest-dark" : "text-cream"}`} />
+              <Menu className="h-6 w-6 text-forest-dark" />
             )}
           </button>
         </div>
