@@ -201,11 +201,10 @@ export default function ChribyTrails() {
               <AnimatePresence initial={false}>
                 {isOpen && (
                   <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.25, ease: "easeInOut" }}
-                    className="overflow-hidden"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.18 }}
                   >
                     <div className="px-5 pb-5 pl-16">
                       <p className="text-sm leading-relaxed text-stone">
