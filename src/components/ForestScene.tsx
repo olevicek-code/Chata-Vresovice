@@ -1,17 +1,20 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
 /**
- * Animated, interactive hero backdrop: layered illustrated forest, a warm
- * golden-hour glow, a shimmering river with reflection, drifting fireflies
- * and deer walking along the water's edge. Everything is drawn with SVG/CSS
- * (no external images needed) — swap it for a real photo later if you like.
+ * Animated, interactive hero backdrop: a panoramic Chřiby hillside sinking
+ * into haze, layered forest with swaying canopies, drifting fog, a
+ * shimmering river, and wildlife (deer, fox, hare, wild boar, birds)
+ * wandering through irregularly. Everything is drawn with SVG/CSS (no
+ * external images needed) — swap it for real photography/video later if
+ * you like.
  */
 
-// Deterministic pseudo-random helper so the tree line looks organic but is
-// stable between renders (no Math.random flashing on every re-render).
+// Deterministic pseudo-random helper so every "organic" shape/timing looks
+// varied but is stable between renders and identical on server + client
+// (no Math.random – that would cause a hydration mismatch).
 function seeded(n: number) {
   return (Math.sin(n * 12.9898) * 43758.5453) % 1;
 }
@@ -43,6 +46,45 @@ function legPath(
     Q${kneeX + kneeW / 2 + 1} ${midBottom} ${kneeX + kneeW / 2} ${kneeY}
     Q${topX + topW / 2 + 2} ${midTop} ${topX + topW / 2} ${topY}
     Z`;
+}
+
+/** Wide, gently rolling ridge line (the Chřiby hills), smoothed through a
+ * handful of seeded control points so it reads as a real skyline rather
+ * than a repeating pattern. */
+function HillRidge({
+  seedOffset,
+  baseline,
+  amplitude,
+  color,
+  opacity,
+}: {
+  seedOffset: number;
+  baseline: number;
+  amplitude: number;
+  color: string;
+  opacity: number;
+}) {
+  const d = useMemo(() => {
+    const segments = 7;
+    const points = Array.from({ length: segments + 1 }, (_, i) => {
+      const x = (i / segments) * 1000;
+      const y = baseline + rand(seedOffset + i, -amplitude, amplitude);
+      return { x, y };
+    });
+    let path = `M0 ${points[0].y.toFixed(1)}`;
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[i];
+      const p1 = points[i + 1];
+      const midX = (p0.x + p1.x) / 2;
+      const midY = (p0.y + p1.y) / 2;
+      path += ` Q${p0.x.toFixed(1)} ${p0.y.toFixed(1)} ${midX.toFixed(1)} ${midY.toFixed(1)}`;
+    }
+    const last = points[points.length - 1];
+    path += ` L1000 ${last.y.toFixed(1)} L1000 220 L0 220 Z`;
+    return path;
+  }, [seedOffset, baseline, amplitude]);
+
+  return <path d={d} fill={color} opacity={opacity} />;
 }
 
 function TreeLine({
@@ -108,12 +150,14 @@ function TreeLine({
   );
 }
 
+type Direction = "ltr" | "rtl";
+
 function Deer({
   size = 1,
   top,
   duration,
   delay = 0,
-  flip = false,
+  direction = "ltr",
   tone = "#152318",
   antlers = true,
 }: {
@@ -121,16 +165,17 @@ function Deer({
   top: string;
   duration: number;
   delay?: number;
-  flip?: boolean;
+  direction?: Direction;
   tone?: string;
   antlers?: boolean;
 }) {
+  const rtl = direction === "rtl";
   return (
     <motion.div
       className="absolute"
       style={{ top, left: 0, width: 0, height: 0 }}
-      initial={{ x: "-25vw" }}
-      animate={{ x: "125vw" }}
+      initial={{ x: rtl ? "125vw" : "-25vw" }}
+      animate={{ x: rtl ? "-25vw" : "125vw" }}
       transition={{ duration, delay, repeat: Infinity, ease: "linear" }}
     >
       <motion.svg
@@ -138,7 +183,7 @@ function Deer({
         width={110 * size}
         height={70 * size}
         style={{
-          transform: flip ? "scaleX(-1)" : undefined,
+          transform: rtl ? "scaleX(-1)" : undefined,
           filter: "drop-shadow(0 6px 10px rgba(0,0,0,0.25))",
         }}
         animate={{ y: [0, -3, 0, -1.5, 0] }}
@@ -212,22 +257,31 @@ function Fox({
   top,
   duration,
   delay = 0,
-  flip = false,
+  direction = "ltr",
   tone = "#3a2113",
+  diagonal = false,
 }: {
   size?: number;
   top: string;
   duration: number;
   delay?: number;
-  flip?: boolean;
+  direction?: Direction;
   tone?: string;
+  /** adds a slow diagonal drift, as if trotting deeper into the woods
+   * rather than tracking a flat horizontal line */
+  diagonal?: boolean;
 }) {
+  const rtl = direction === "rtl";
   return (
     <motion.div
       className="absolute"
       style={{ top, left: 0, width: 0, height: 0 }}
-      initial={{ x: "-20vw" }}
-      animate={{ x: "120vw" }}
+      initial={{ x: rtl ? "120vw" : "-20vw", y: 0, scale: 1 }}
+      animate={{
+        x: rtl ? "-20vw" : "120vw",
+        y: diagonal ? [0, -22, -10] : 0,
+        scale: diagonal ? [1, 0.82, 0.9] : 1,
+      }}
       transition={{ duration, delay, repeat: Infinity, ease: "linear" }}
     >
       <motion.svg
@@ -235,7 +289,7 @@ function Fox({
         width={96 * size}
         height={60 * size}
         style={{
-          transform: flip ? "scaleX(-1)" : undefined,
+          transform: rtl ? "scaleX(-1)" : undefined,
           filter: "drop-shadow(0 5px 8px rgba(0,0,0,0.25))",
         }}
         animate={{ y: [0, -4, 0, -2, 0] }}
@@ -292,6 +346,165 @@ function Fox({
   );
 }
 
+/** Zajíc – small, fast, low-detail silhouette; at this size and speed a
+ * single running blob with a hop reads better than articulated legs. */
+function Hare({
+  size = 1,
+  top,
+  duration,
+  delay = 0,
+  direction = "ltr",
+  tone = "#2a2018",
+}: {
+  size?: number;
+  top: string;
+  duration: number;
+  delay?: number;
+  direction?: Direction;
+  tone?: string;
+}) {
+  const rtl = direction === "rtl";
+  return (
+    <motion.div
+      className="absolute"
+      style={{ top, left: 0, width: 0, height: 0 }}
+      initial={{ x: rtl ? "115vw" : "-15vw" }}
+      animate={{ x: rtl ? "-15vw" : "115vw" }}
+      transition={{ duration, delay, repeat: Infinity, ease: "easeInOut" }}
+    >
+      <motion.svg
+        viewBox="0 0 90 60"
+        width={46 * size}
+        height={30 * size}
+        style={{
+          transform: rtl ? "scaleX(-1)" : undefined,
+          filter: "drop-shadow(0 3px 5px rgba(0,0,0,0.25))",
+        }}
+        animate={{ y: [0, -9, 0], scaleY: [1, 0.88, 1] }}
+        transition={{ duration: 0.28, repeat: Infinity, ease: "easeInOut" }}
+        aria-hidden
+      >
+        <path
+          fill={tone}
+          d="M15 40 C8 38 5 30 10 24 C16 18 28 17 38 21
+             C40 12 44 4 50 2 C49 9 48 15 50 20
+             C52 12 57 5 63 4 C61 11 59 17 58 22
+             C68 20 78 24 83 30 C79 27 74 27 71 30
+             C74 33 73 38 67 40 C52 45 30 45 15 40 Z"
+        />
+      </motion.svg>
+    </motion.div>
+  );
+}
+
+/** Divočák – stocky, low, glimpsed only briefly between the trees rather
+ * than crossing the whole clearing. */
+function Boar({
+  size = 1,
+  top,
+  duration,
+  delay = 0,
+  direction = "ltr",
+  tone = "#241c16",
+}: {
+  size?: number;
+  top: string;
+  duration: number;
+  delay?: number;
+  direction?: Direction;
+  tone?: string;
+}) {
+  const rtl = direction === "rtl";
+  return (
+    <motion.div
+      className="absolute"
+      style={{ top, left: 0, width: 0, height: 0 }}
+      initial={{ x: rtl ? "62vw" : "30vw", opacity: 0 }}
+      animate={{ x: rtl ? "28vw" : "64vw", opacity: [0, 1, 1, 0] }}
+      transition={{ duration, delay, repeat: Infinity, ease: "easeInOut" }}
+    >
+      <motion.svg
+        viewBox="0 0 140 90"
+        width={72 * size}
+        height={46 * size}
+        style={{
+          transform: rtl ? "scaleX(-1)" : undefined,
+          filter: "drop-shadow(0 5px 8px rgba(0,0,0,0.3))",
+        }}
+        animate={{ y: [0, -2, 0, -1, 0] }}
+        transition={{ duration: 0.7, repeat: Infinity, ease: "easeInOut" }}
+        aria-hidden
+      >
+        <g fill={tone}>
+          <path d={legPath(34, 60, 11, 32, 74, 7, 30, 84, 6)} />
+          <path d={legPath(52, 62, 10, 52, 76, 6.5, 50, 84, 6)} />
+          <path d={legPath(90, 58, 11, 94, 74, 7, 98, 84, 6)} />
+          <path d={legPath(106, 56, 10, 110, 72, 6.5, 114, 84, 6)} />
+
+          {/* stocky rounded body with a slightly bristled back ridge */}
+          <path
+            d="M18 58 C10 55 8 46 14 40 C20 34 34 30 50 30
+               C48 24 54 18 64 16 C70 15 78 17 82 22
+               C88 20 96 22 100 28 C106 26 112 28 114 34
+               C110 36 106 36 104 34 C106 40 102 46 94 48
+               C80 54 50 56 18 58 Z"
+          />
+          {/* pointed snout */}
+          <path d="M12 44 C6 43 2 40 1 36 C5 35 10 37 13 41 Z" />
+          {/* small alert ear */}
+          <path d="M56 22 C56 16 60 12 66 11 C64 16 61 20 56 22 Z" />
+        </g>
+      </motion.svg>
+    </motion.div>
+  );
+}
+
+/** Minimal flapping bird mark, crossing high above the tree line. */
+function Bird({
+  top,
+  duration,
+  delay = 0,
+  direction = "ltr",
+  size = 1,
+  tone = "rgba(20, 26, 20, 0.55)",
+}: {
+  top: string;
+  duration: number;
+  delay?: number;
+  direction?: Direction;
+  size?: number;
+  tone?: string;
+}) {
+  const rtl = direction === "rtl";
+  return (
+    <motion.div
+      className="absolute"
+      style={{ top, left: 0, width: 0, height: 0 }}
+      initial={{ x: rtl ? "110vw" : "-10vw" }}
+      animate={{ x: rtl ? "-10vw" : "110vw", y: [0, -10, 0, 8, 0] }}
+      transition={{ duration, delay, repeat: Infinity, ease: "linear" }}
+    >
+      <motion.svg
+        viewBox="0 0 40 16"
+        width={26 * size}
+        height={11 * size}
+        style={{ transform: rtl ? "scaleX(-1)" : undefined }}
+        animate={{ scaleY: [1, 0.35, 1] }}
+        transition={{ duration: 0.55, repeat: Infinity, ease: "easeInOut" }}
+        aria-hidden
+      >
+        <path
+          d="M0 10 Q10 0 20 10 Q30 0 40 10"
+          stroke={tone}
+          strokeWidth="2.4"
+          strokeLinecap="round"
+          fill="none"
+        />
+      </motion.svg>
+    </motion.div>
+  );
+}
+
 function Firefly({ index }: { index: number }) {
   const seed = useMemo(() => {
     const r = (n: number) => (Math.sin(index * 999 + n) + 1) / 2;
@@ -318,6 +531,73 @@ function Firefly({ index }: { index: number }) {
   );
 }
 
+/** Soft, slow-drifting mist patch used between the tree layers. */
+function FogPatch({
+  top,
+  width,
+  duration,
+  delay,
+  opacity = 1,
+}: {
+  top: string;
+  width: number;
+  duration: number;
+  delay: number;
+  opacity?: number;
+}) {
+  return (
+    <motion.div
+      className="absolute rounded-[50%] blur-2xl"
+      style={{
+        top,
+        width,
+        height: width * 0.28,
+        opacity,
+        background:
+          "radial-gradient(closest-side, rgba(245,242,232,0.55), rgba(245,242,232,0) 75%)",
+      }}
+      initial={{ x: "-30%" }}
+      animate={{ x: "130%" }}
+      transition={{ duration, delay, repeat: Infinity, ease: "linear" }}
+    />
+  );
+}
+
+/** Thin foreground grass blades that sway in the wind and lead the
+ * parallax (closest layer moves the most). */
+function GrassField() {
+  const blades = useMemo(
+    () =>
+      Array.from({ length: 46 }, (_, i) => {
+        const x = (i / 46) * 100 + rand(400 + i, -0.6, 0.6);
+        const h = rand(420 + i, 9, 20);
+        const w = rand(440 + i, 1.3, 2.6);
+        return { x, h, w };
+      }),
+    []
+  );
+
+  return (
+    <svg
+      className="absolute bottom-0 left-0 w-full"
+      viewBox="0 0 100 22"
+      preserveAspectRatio="none"
+      height={44}
+      aria-hidden
+    >
+      {blades.map((b, i) => (
+        <path
+          key={i}
+          d={`M${b.x} 22 Q${b.x - b.w} ${22 - b.h * 0.55} ${b.x - b.w * 0.2} ${22 - b.h}
+              Q${b.x + b.w * 0.3} ${22 - b.h * 0.55} ${b.x} 22 Z`}
+          fill="#0f1c14"
+          opacity={0.85}
+        />
+      ))}
+    </svg>
+  );
+}
+
 export default function ForestScene() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [reduceMotion] = useState(
@@ -326,24 +606,51 @@ export default function ForestScene() {
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
   );
   const mx = useMotionValue(0);
-  const treeShiftFar = useSpring(useTransform(mx, [-1, 1], [8, -8]), {
-    stiffness: 40,
-    damping: 20,
-  });
-  const treeShiftMid = useSpring(useTransform(mx, [-1, 1], [16, -16]), {
-    stiffness: 40,
-    damping: 20,
-  });
-  const treeShiftNear = useSpring(useTransform(mx, [-1, 1], [26, -26]), {
-    stiffness: 40,
-    damping: 20,
-  });
+  const my = useMotionValue(0);
+
+  // subtle device-tilt parallax on phones, on top of the mouse-driven one
+  // above – both just push the same motion values, so whichever input is
+  // actually available on the device wins.
+  useEffect(() => {
+    if (reduceMotion || typeof window === "undefined") return;
+    if (!window.DeviceOrientationEvent) return;
+
+    const onTilt = (e: DeviceOrientationEvent) => {
+      if (e.gamma == null || e.beta == null) return;
+      mx.set(Math.max(-1, Math.min(1, e.gamma / 25)));
+      my.set(Math.max(-1, Math.min(1, (e.beta - 45) / 30)));
+    };
+    window.addEventListener("deviceorientation", onTilt);
+    return () => window.removeEventListener("deviceorientation", onTilt);
+  }, [reduceMotion, mx, my]);
+
+  const spring = { stiffness: 40, damping: 20 };
+  const hillShift = useSpring(useTransform(mx, [-1, 1], [2, -2]), spring);
+  const farShift = useSpring(useTransform(mx, [-1, 1], [8, -8]), spring);
+  const farShiftY = useSpring(useTransform(my, [-1, 1], [2, -2]), spring);
+  const midShift = useSpring(useTransform(mx, [-1, 1], [16, -16]), spring);
+  const midShiftY = useSpring(useTransform(my, [-1, 1], [4, -4]), spring);
+  const nearShift = useSpring(useTransform(mx, [-1, 1], [26, -26]), spring);
+  const nearShiftY = useSpring(useTransform(my, [-1, 1], [6, -6]), spring);
+  const grassShift = useSpring(useTransform(mx, [-1, 1], [40, -40]), spring);
+  const grassShiftY = useSpring(useTransform(my, [-1, 1], [10, -10]), spring);
 
   const handleMouseMove: React.MouseEventHandler<HTMLDivElement> = (e) => {
     const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) return;
     mx.set(((e.clientX - rect.left) / rect.width) * 2 - 1);
+    my.set(((e.clientY - rect.top) / rect.height) * 2 - 1);
   };
+
+  const swaySlow = reduceMotion
+    ? { rotate: 0 }
+    : { rotate: [-0.5, 0.5, -0.5] };
+  const swayMed = reduceMotion
+    ? { rotate: 0 }
+    : { rotate: [-0.8, 0.8, -0.8] };
+  const swayFast = reduceMotion
+    ? { skewX: 0 }
+    : { skewX: [-1.4, 1.4, -1.4] };
 
   return (
     <div
@@ -352,17 +659,52 @@ export default function ForestScene() {
       className="absolute inset-0 overflow-hidden"
       aria-hidden
     >
-      {/* sky */}
+      {/* sky – warm early-morning/evening light */}
       <div className="absolute inset-0 bg-[linear-gradient(165deg,#162720_0%,#26402f_45%,#3d5a41_78%,#5c7a4e_100%)]" />
 
       {/* warm golden-hour glow near the horizon */}
       <div className="absolute inset-x-0 bottom-[18%] h-[45%] bg-[radial-gradient(60%_100%_at_72%_100%,rgba(230,168,101,0.35),transparent_70%)]" />
       <div className="absolute inset-x-0 bottom-[18%] h-[45%] bg-[radial-gradient(40%_80%_at_18%_100%,rgba(201,143,94,0.2),transparent_70%)]" />
 
+      {/* very subtle dappled-light flicker, as if sun is filtering through
+          moving branches */}
+      {!reduceMotion && (
+        <motion.div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(55% 45% at 65% 28%, rgba(255,238,204,0.16), transparent 70%)",
+          }}
+          animate={{ opacity: [0.5, 1, 0.6, 0.9, 0.5] }}
+          transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+        />
+      )}
+
+      {/* panoramic Chřiby hillside, sinking into atmospheric haze behind
+          the forest */}
+      <motion.div
+        style={{ x: reduceMotion ? 0 : hillShift }}
+        className="absolute bottom-[38%] left-[-5%] w-[130%] opacity-80"
+      >
+        <svg
+          className="w-full"
+          viewBox="0 0 1000 220"
+          preserveAspectRatio="none"
+          height={130}
+        >
+          <HillRidge seedOffset={5} baseline={70} amplitude={26} color="#5e7768" opacity={0.4} />
+          <HillRidge seedOffset={19} baseline={110} amplitude={30} color="#4c6456" opacity={0.55} />
+        </svg>
+        {/* haze eating into the base of the hills for depth */}
+        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-transparent via-[#cfd8c8]/25 to-transparent" />
+      </motion.div>
+
       {/* far, softly blurred tree line */}
       <motion.div
-        style={{ x: reduceMotion ? 0 : treeShiftFar }}
-        className="absolute bottom-[30%] left-[-5%] w-[130%] opacity-70 blur-[1.5px]"
+        style={{ x: reduceMotion ? 0 : farShift, y: reduceMotion ? 0 : farShiftY }}
+        animate={swaySlow}
+        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute bottom-[30%] left-[-5%] w-[130%] origin-bottom opacity-70 blur-[1.5px]"
       >
         <TreeLine
           seedOffset={1}
@@ -374,13 +716,24 @@ export default function ForestScene() {
         />
       </motion.div>
 
+      {/* drifting fog between the layers */}
+      {!reduceMotion && (
+        <>
+          <FogPatch top="24%" width={340} duration={52} delay={0} opacity={0.5} />
+          <FogPatch top="33%" width={260} duration={68} delay={14} opacity={0.4} />
+          <FogPatch top="20%" width={220} duration={60} delay={30} opacity={0.35} />
+        </>
+      )}
+
       {/* soft mist band between layers for depth */}
       <div className="absolute inset-x-0 bottom-[27%] h-16 bg-gradient-to-t from-transparent via-cream/10 to-transparent blur-md" />
 
       {/* mid tree line */}
       <motion.div
-        style={{ x: reduceMotion ? 0 : treeShiftMid }}
-        className="absolute bottom-[23%] left-[-5%] w-[130%] opacity-90"
+        style={{ x: reduceMotion ? 0 : midShift, y: reduceMotion ? 0 : midShiftY }}
+        animate={swayMed}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+        className="absolute bottom-[23%] left-[-5%] w-[130%] origin-bottom opacity-90"
       >
         <TreeLine
           seedOffset={41}
@@ -392,14 +745,24 @@ export default function ForestScene() {
         />
       </motion.div>
 
+      {/* birds crossing high above the canopy */}
+      {!reduceMotion && (
+        <>
+          <Bird top="14%" duration={16} delay={4} direction="ltr" size={1} />
+          <Bird top="21%" duration={20} delay={24} direction="rtl" size={0.8} />
+        </>
+      )}
+
       {/* fireflies drifting between the trees */}
       {!reduceMotion &&
         Array.from({ length: 9 }).map((_, i) => <Firefly key={i} index={i} />)}
 
       {/* near, darker tree line framing the bottom of the scene */}
       <motion.div
-        style={{ x: reduceMotion ? 0 : treeShiftNear }}
-        className="absolute bottom-[15%] left-[-5%] w-[130%]"
+        style={{ x: reduceMotion ? 0 : nearShift, y: reduceMotion ? 0 : nearShiftY }}
+        animate={swayMed}
+        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        className="absolute bottom-[15%] left-[-5%] w-[130%] origin-bottom"
       >
         <TreeLine
           seedOffset={97}
@@ -411,19 +774,51 @@ export default function ForestScene() {
         />
       </motion.div>
 
-      {/* deer walking along the clearing at the water's edge, in front of
-          the near tree line so they stay clearly visible */}
+      {/* wildlife wandering along the clearing at the water's edge – each
+          species has its own out-of-sync cycle length, so the mix of who's
+          visible keeps drifting instead of repeating the same way twice,
+          while staying to two or three animals on screen at once */}
       {!reduceMotion && (
         <>
-          {/* stag, with antlers */}
-          <Deer top="71%" duration={30} size={1.4} />
-          {/* srnka (doe) – same silhouette, no antlers, walking the other way */}
-          <Deer top="76%" duration={38} size={0.85} delay={7} flip tone="#1c2c1f" antlers={false} />
-          {/* liška (fox), trotting past a little quicker than the deer */}
-          <Fox top="74%" duration={21} size={1} delay={3} />
-          <Fox top="78%" duration={26} size={0.7} delay={16} flip tone="#2e1a0e" />
+          {/* jelen (stag), with antlers */}
+          <Deer top="70%" duration={34} delay={0} size={1.4} />
+          {/* divočák, glimpsed only briefly between the trees */}
+          <Boar top="79%" duration={9} delay={8} direction="ltr" size={1} />
+          {/* liška (fox), trotting past and drifting deeper into the woods */}
+          <Fox top="74%" duration={20} delay={20} direction="ltr" size={1} diagonal />
+          {/* srna (doe) with srnče (fawn) close behind, walking the other way */}
+          <Deer
+            top="76%"
+            duration={40}
+            delay={38}
+            size={0.85}
+            direction="rtl"
+            tone="#1c2c1f"
+            antlers={false}
+          />
+          <Deer
+            top="77.5%"
+            duration={40}
+            delay={38.6}
+            size={0.48}
+            direction="rtl"
+            tone="#22331f"
+            antlers={false}
+          />
+          {/* zajíc, a quick dash across the clearing */}
+          <Hare top="82%" duration={7} delay={55} direction="rtl" size={1} />
         </>
       )}
+
+      {/* foreground grass, swaying and leading the parallax */}
+      <motion.div
+        style={{ x: reduceMotion ? 0 : grassShift, y: reduceMotion ? 0 : grassShiftY }}
+        animate={swayFast}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute inset-x-0 bottom-0 origin-bottom"
+      >
+        <GrassField />
+      </motion.div>
 
       {/* a calm stream along the bottom edge – soft-edged (no hard band),
           a believable teal-blue so it reads as water rather than a stripe
