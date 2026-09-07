@@ -1,5 +1,6 @@
 import AnimatedSection from "./AnimatedSection";
 import AttractionsExplorer from "./AttractionsExplorer";
+import ChribyTrails from "./ChribyTrails";
 
 export default function Surroundings() {
   return (
@@ -23,6 +24,22 @@ export default function Surroundings() {
 
         <AnimatedSection delay={0.05} className="mt-10">
           <AttractionsExplorer />
+        </AnimatedSection>
+
+        <AnimatedSection delay={0.1} className="mt-16">
+          <p className="text-sm font-semibold uppercase tracking-widest text-wood">
+            Pro pěší turisty
+          </p>
+          <h3 className="mt-2 font-display text-2xl font-medium text-forest-dark sm:text-3xl">
+            20 tipů na túru po Chřibech
+          </h3>
+          <p className="mt-3 max-w-2xl text-sm text-stone">
+            Vrcholy, skály, studánky i zřícenina hradu v okolních lesích –
+            rozklikněte si místo pro popis, na mapě se vám zvýrazní.
+          </p>
+          <div className="mt-6">
+            <ChribyTrails />
+          </div>
         </AnimatedSection>
 
         <AnimatedSection delay={0.15} className="mt-12">
