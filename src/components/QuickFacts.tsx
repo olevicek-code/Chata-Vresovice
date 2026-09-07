@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView, animate } from "framer-motion";
 import { CalendarHeart, Users, BedDouble, MapPinned } from "lucide-react";
+import ContourLines from "./ContourLines";
 
 const FACTS = [
   { icon: CalendarHeart, value: 2025, prefix: "", suffix: "", label: "Chata je naše od roku" },
@@ -31,8 +32,9 @@ function Counter({ value }: { value: number }) {
 
 export default function QuickFacts() {
   return (
-    <section className="bg-forest-dark py-16 text-cream">
-      <div className="mx-auto grid max-w-6xl grid-cols-2 gap-8 px-5 sm:grid-cols-4">
+    <section className="relative overflow-hidden bg-forest-dark py-16 text-cream">
+      <ContourLines />
+      <div className="relative z-10 mx-auto grid max-w-6xl grid-cols-2 gap-8 px-5 sm:grid-cols-4">
         {FACTS.map(({ icon: Icon, value, prefix, suffix, label }, i) => (
           <motion.div
             key={label}

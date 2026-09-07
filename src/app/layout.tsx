@@ -1,9 +1,17 @@
 import type { Metadata } from "next";
+import { JetBrains_Mono } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ScrollProgress from "@/components/ScrollProgress";
 import BackToTop from "@/components/BackToTop";
+import CustomCursor from "@/components/CustomCursor";
 import "./globals.css";
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-jetbrains-mono",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Chata Vřesovice | Odpočinek uprostřed přírody",
@@ -13,8 +21,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="cs" className="h-full antialiased">
+    <html lang="cs" className={`h-full antialiased ${jetbrainsMono.variable}`}>
       <body className="min-h-full flex flex-col bg-background text-foreground">
+        <CustomCursor />
         <ScrollProgress />
         {/* faint grain texture over the whole page for a more tactile,
             natural feel instead of flat digital color fields */}

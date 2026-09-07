@@ -4,6 +4,8 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowDown, CalendarCheck } from "lucide-react";
 import ForestScene from "./ForestScene";
+import MagneticButton from "./MagneticButton";
+import TechHud from "./TechHud";
 
 export default function Hero() {
   return (
@@ -48,20 +50,33 @@ export default function Hero() {
           transition={{ duration: 0.7, delay: 0.3 }}
           className="mt-4 flex flex-wrap items-center gap-4"
         >
-          <Link
-            href="/rezervace"
-            className="flex items-center gap-2 rounded-full bg-wood-light px-6 py-3 text-sm font-semibold text-forest-dark shadow-lg transition-transform hover:scale-[1.03]"
-          >
-            <CalendarCheck className="h-4 w-4" />
-            Rezervovat pobyt
-          </Link>
-          <a
-            href="#o-chate"
-            className="flex items-center gap-2 rounded-full border border-cream/40 px-6 py-3 text-sm font-medium text-cream/90 transition-colors hover:bg-cream/10"
-          >
-            Prohlédnout chatu
-            <ArrowDown className="h-4 w-4" />
-          </a>
+          <MagneticButton>
+            <Link
+              href="/rezervace"
+              className="flex items-center gap-2 rounded-full bg-wood-light px-6 py-3 text-sm font-semibold text-forest-dark shadow-lg"
+            >
+              <CalendarCheck className="h-4 w-4" />
+              Rezervovat pobyt
+            </Link>
+          </MagneticButton>
+          <MagneticButton strength={0.25}>
+            <a
+              href="#o-chate"
+              className="flex items-center gap-2 rounded-full border border-cream/40 px-6 py-3 text-sm font-medium text-cream/90 transition-colors hover:bg-cream/10"
+            >
+              Prohlédnout chatu
+              <ArrowDown className="h-4 w-4" />
+            </a>
+          </MagneticButton>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.45 }}
+          className="mt-4"
+        >
+          <TechHud />
         </motion.div>
       </div>
     </section>

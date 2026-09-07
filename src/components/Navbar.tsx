@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Menu, X, TreePine } from "lucide-react";
+import AmbientSound from "./AmbientSound";
 
 const HOME_LINKS = [
   { href: "/#o-chate", label: "O chatě", id: "o-chate" },
@@ -60,46 +61,60 @@ export default function Navbar() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
         <Link
           href="/"
-          className="flex items-center gap-2 font-display text-lg font-medium text-forest-dark"
+          className={`flex items-center gap-2 font-display text-lg font-medium transition-colors ${
+            scrolled ? "text-forest-dark" : "text-cream"
+          }`}
         >
-          <TreePine className="h-6 w-6 text-forest" />
+          <TreePine className={`h-6 w-6 ${scrolled ? "text-forest" : "text-signal"}`} />
           Chata Vřesovice
         </Link>
 
-        <nav className="hidden items-center gap-7 md:flex">
-          {HOME_LINKS.map((link) => (
+        <div className="flex items-center gap-1">
+          <nav className="hidden items-center gap-7 md:flex">
+            {HOME_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`relative text-sm font-medium transition-colors ${
+                  scrolled
+                    ? active === link.id
+                      ? "text-forest-dark"
+                      : "text-stone hover:text-forest-dark"
+                    : active === link.id
+                      ? "text-cream"
+                      : "text-cream/75 hover:text-cream"
+                }`}
+              >
+                {link.label}
+                {active === link.id && (
+                  <span className="absolute -bottom-1.5 left-0 h-[2px] w-full rounded-full bg-wood-light" />
+                )}
+              </Link>
+            ))}
             <Link
-              key={link.href}
-              href={link.href}
-              className={`relative text-sm font-medium transition-colors hover:text-forest-dark ${
-                active === link.id ? "text-forest-dark" : "text-stone"
-              }`}
+              href="/rezervace"
+              className="rounded-full bg-forest px-5 py-2 text-sm font-semibold text-cream shadow-sm transition-colors hover:bg-forest-dark"
             >
-              {link.label}
-              {active === link.id && (
-                <span className="absolute -bottom-1.5 left-0 h-[2px] w-full rounded-full bg-wood-light" />
-              )}
+              Rezervovat pobyt
             </Link>
-          ))}
-          <Link
-            href="/rezervace"
-            className="rounded-full bg-forest px-5 py-2 text-sm font-semibold text-cream shadow-sm transition-colors hover:bg-forest-dark"
-          >
-            Rezervovat pobyt
-          </Link>
-        </nav>
+          </nav>
 
-        <button
-          className="md:hidden"
-          aria-label={open ? "Zavřít menu" : "Otevřít menu"}
-          onClick={() => setOpen((v) => !v)}
-        >
-          {open ? (
-            <X className="h-6 w-6 text-forest-dark" />
-          ) : (
-            <Menu className="h-6 w-6 text-forest-dark" />
-          )}
-        </button>
+          <div className={scrolled ? "text-forest-dark" : "text-cream"}>
+            <AmbientSound />
+          </div>
+
+          <button
+            className="md:hidden"
+            aria-label={open ? "Zavřít menu" : "Otevřít menu"}
+            onClick={() => setOpen((v) => !v)}
+          >
+            {open ? (
+              <X className={`h-6 w-6 ${scrolled ? "text-forest-dark" : "text-cream"}`} />
+            ) : (
+              <Menu className={`h-6 w-6 ${scrolled ? "text-forest-dark" : "text-cream"}`} />
+            )}
+          </button>
+        </div>
       </div>
 
       {open && (

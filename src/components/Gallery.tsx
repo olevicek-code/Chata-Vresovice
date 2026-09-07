@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
 import AnimatedSection from "./AnimatedSection";
+import TiltCard from "./TiltCard";
 
 const PLACEHOLDER_IMAGES = [
   { label: "Exteriér chaty", gradient: "from-forest/40 via-wood-light/30 to-forest/10" },
@@ -46,15 +47,17 @@ export default function Gallery() {
         <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3">
           {PLACEHOLDER_IMAGES.map((img, i) => (
             <AnimatedSection key={img.label} delay={i * 0.04}>
-              <button
-                onClick={() => setActiveIndex(i)}
-                className={`group relative flex aspect-square w-full flex-col items-center justify-center gap-2 rounded-xl bg-gradient-to-br ${img.gradient} text-center transition-transform hover:scale-[1.02]`}
-              >
-                <ImageIcon className="h-7 w-7 text-forest-dark/60" />
-                <span className="px-3 text-xs font-medium text-forest-dark/80">
-                  {img.label}
-                </span>
-              </button>
+              <TiltCard>
+                <button
+                  onClick={() => setActiveIndex(i)}
+                  className={`relative flex aspect-square w-full flex-col items-center justify-center gap-2 rounded-xl bg-gradient-to-br ${img.gradient} text-center shadow-sm`}
+                >
+                  <ImageIcon className="h-7 w-7 text-forest-dark/60" />
+                  <span className="px-3 text-xs font-medium text-forest-dark/80">
+                    {img.label}
+                  </span>
+                </button>
+              </TiltCard>
             </AnimatedSection>
           ))}
         </div>

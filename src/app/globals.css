@@ -9,6 +9,10 @@
   --wood-light: #c98f5e;
   --cream: #faf7f2;
   --stone: #6b6459;
+  /* bioluminescent accent used for the "tech" data/HUD layer –
+     kept separate from the rustic palette above so it reads as an
+     overlay of instrumentation on top of the forest, not a repaint of it */
+  --signal: #55e0a8;
 }
 
 @theme inline {
@@ -20,9 +24,12 @@
   --color-wood-light: var(--wood-light);
   --color-cream: var(--cream);
   --color-stone: var(--stone);
+  --color-signal: var(--signal);
   --font-sans: "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial,
     sans-serif;
   --font-display: "Iowan Old Style", Georgia, "Times New Roman", serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, "JetBrains Mono",
+    Menlo, Consolas, monospace;
 }
 
 html {
@@ -63,4 +70,72 @@ body {
 .rdp-root {
   --rdp-accent-color: var(--forest) !important;
   --rdp-today-color: var(--wood) !important;
+}
+
+/* ---- tech/HUD layer ---------------------------------------------- */
+
+.glass-panel {
+  background: color-mix(in srgb, var(--forest-dark) 60%, transparent);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid color-mix(in srgb, var(--signal) 30%, transparent);
+}
+
+.signal-glow {
+  box-shadow: 0 0 32px -8px color-mix(in srgb, var(--signal) 55%, transparent);
+}
+
+@keyframes contour-drift {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -40;
+  }
+}
+
+/* custom cursor – only ever enabled by CustomCursor.tsx after confirming
+   a fine pointer + no reduced-motion preference, so touch users never
+   lose their native cursor */
+.has-custom-cursor,
+.has-custom-cursor a,
+.has-custom-cursor button {
+  cursor: none;
+}
+
+.cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 200;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--signal);
+  pointer-events: none;
+  transform: translate(var(--x, -100px), var(--y, -100px)) translate(-50%, -50%);
+  box-shadow: 0 0 8px 2px color-mix(in srgb, var(--signal) 70%, transparent);
+}
+
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 200;
+  width: 34px;
+  height: 34px;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in srgb, var(--signal) 55%, transparent);
+  pointer-events: none;
+  transform: translate(var(--x, -100px), var(--y, -100px)) translate(-50%, -50%)
+    scale(1);
+  transition: transform 0.15s ease-out, background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.cursor-ring--active {
+  transform: translate(var(--x, -100px), var(--y, -100px)) translate(-50%, -50%)
+    scale(1.6);
+  background: color-mix(in srgb, var(--signal) 14%, transparent);
+  border-color: var(--signal);
 }
