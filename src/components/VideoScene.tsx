@@ -9,22 +9,34 @@
  * so the palette stays consistent across clips and the foreground text
  * stays legible.
  *
+ * The two <video> elements are a manual cross-fade double-buffer, driven
+ * entirely inside one mount effect (not React state) – this is frame-by-
+ * frame media choreography, which React's render cycle isn't a good fit
+ * for and only adds room for stale-closure bugs.
+ *
  * Footage (Pexels License – free for commercial use, no attribution
  * required): pexels.com/video/15070555, /8553227, /9422693, /28588755
  */
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-const SOURCES: Record<string, string> = {
+const SOURCES = {
   hills: "/videos/hills.mp4",
   deer: "/videos/deer.mp4",
   fawn: "/videos/fawn.mp4",
   birds: "/videos/birds.mp4",
-};
+} as const;
 
 // The landscape anchors the scene; wildlife is a brief cutaway between
 // returns to it, so the panorama stays the dominant, calming element.
-const PLAYLIST = ["hills", "deer", "hills", "fawn", "hills", "birds"] as const;
+const PLAYLIST: (keyof typeof SOURCES)[] = [
+  "hills",
+  "deer",
+  "hills",
+  "fawn",
+  "hills",
+  "birds",
+];
 
 export default function VideoScene() {
   const [reduceMotion] = useState(
@@ -32,44 +44,50 @@ export default function VideoScene() {
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
   );
-  const videoARef = useRef<HTMLVideoElement>(null);
-  const videoBRef = useRef<HTMLVideoElement>(null);
-  const [frontLayer, setFrontLayer] = useState<"a" | "b">("a");
-  const stepRef = useRef(0);
-
-  const advance = useCallback(() => {
-    const incomingLayer = frontLayer === "a" ? "b" : "a";
-    stepRef.current = (stepRef.current + 1) % PLAYLIST.length;
-    const nextKey = PLAYLIST[stepRef.current];
-    const incomingEl = incomingLayer === "a" ? videoARef.current : videoBRef.current;
-    if (incomingEl) {
-      incomingEl.src = SOURCES[nextKey];
-      incomingEl.currentTime = 0;
-      incomingEl.play().catch(() => {});
-    }
-    setFrontLayer(incomingLayer);
-  }, [frontLayer]);
+  const aRef = useRef<HTMLVideoElement>(null);
+  const bRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    const a = videoARef.current;
-    if (!a) return;
+    const a = aRef.current;
+    const b = bRef.current;
+    if (!a || !b) return;
+
     a.src = SOURCES[PLAYLIST[0]];
+
     if (reduceMotion) {
       // still show a real frame of the landscape, just frozen
       a.currentTime = 1;
-      a.pause();
-    } else {
-      a.play().catch(() => {});
+      return;
     }
-  }, [reduceMotion]);
 
-  useEffect(() => {
-    if (reduceMotion) return;
-    const current = frontLayer === "a" ? videoARef.current : videoBRef.current;
-    if (!current) return;
-    current.addEventListener("ended", advance);
-    return () => current.removeEventListener("ended", advance);
-  }, [frontLayer, advance, reduceMotion]);
+    a.play().catch(() => {});
+
+    let step = 0;
+    let front = a;
+    let back = b;
+    let cancelled = false;
+
+    const showNext = () => {
+      if (cancelled) return;
+      step = (step + 1) % PLAYLIST.length;
+      back.src = SOURCES[PLAYLIST[step]];
+      back.currentTime = 0;
+      back.play().catch(() => {});
+      back.style.opacity = "1";
+      front.style.opacity = "0";
+      front.removeEventListener("ended", showNext);
+      back.addEventListener("ended", showNext);
+      [front, back] = [back, front];
+    };
+
+    a.addEventListener("ended", showNext);
+
+    return () => {
+      cancelled = true;
+      a.removeEventListener("ended", showNext);
+      b.removeEventListener("ended", showNext);
+    };
+  }, [reduceMotion]);
 
   const kenBurns = (delay: number) =>
     reduceMotion
@@ -79,28 +97,22 @@ export default function VideoScene() {
   return (
     <div className="absolute inset-0 overflow-hidden bg-forest-dark">
       <video
-        ref={videoARef}
+        ref={aRef}
         muted
         playsInline
         preload="auto"
         aria-hidden
         className="absolute inset-0 h-full w-full object-cover transition-opacity duration-[1600ms] ease-in-out"
-        style={{
-          opacity: frontLayer === "a" ? 1 : 0,
-          animation: kenBurns(0),
-        }}
+        style={{ opacity: 1, animation: kenBurns(0) }}
       />
       <video
-        ref={videoBRef}
+        ref={bRef}
         muted
         playsInline
         preload="auto"
         aria-hidden
         className="absolute inset-0 h-full w-full object-cover transition-opacity duration-[1600ms] ease-in-out"
-        style={{
-          opacity: frontLayer === "b" ? 1 : 0,
-          animation: kenBurns(0.4),
-        }}
+        style={{ opacity: 0, animation: kenBurns(0.4) }}
       />
 
       {/* warm color-grade so every clip reads as the same golden-hour
