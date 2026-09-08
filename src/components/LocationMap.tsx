@@ -48,7 +48,7 @@ export default function LocationMap() {
           icon: pinIcon(L, "🏡", "bg-forest-dark", 38),
         })
           .addTo(map)
-          .bindPopup?.("Chata Vřesovice, Vřesovice 569");
+          .bindPopup?.(CHATA.label);
 
         map.setView([CHATA.lat, CHATA.lon], 17);
       })

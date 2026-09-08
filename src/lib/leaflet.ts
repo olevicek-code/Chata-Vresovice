@@ -34,7 +34,8 @@ declare global {
 const LEAFLET_CSS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
 const LEAFLET_JS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
 
-export const CHATA = { lat: 49.059051, lon: 17.215106, label: "Chata Vřesovice" };
+// Official RÚIAN (ČÚZK) address point for č.ev. 569, Vřesovice.
+export const CHATA = { lat: 49.067537, lon: 17.220495, label: "Chata Vřesovice, Vřesovice 569" };
 
 let leafletLoading: Promise<void> | null = null;
 

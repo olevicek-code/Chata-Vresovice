@@ -12,10 +12,10 @@ import {
   CloudLightning,
   Radio,
 } from "lucide-react";
+import { CHATA } from "@/lib/leaflet";
 
-// Coordinates of the cottage (see Surroundings.tsx / the OSM embed below).
-const LAT = 49.059051;
-const LON = 17.215106;
+const LAT = CHATA.lat;
+const LON = CHATA.lon;
 
 type Weather = {
   temp: number;
@@ -118,7 +118,7 @@ export default function TechHud() {
             })
           : "--:--:--"}
         <span className="text-[10px] uppercase tracking-widest text-cream/50">
-          49.059N 17.215E
+          49.068N 17.220E
         </span>
       </div>
 
