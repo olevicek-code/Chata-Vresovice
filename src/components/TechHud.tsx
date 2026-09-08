@@ -121,7 +121,7 @@ export default function TechHud() {
           <span className="relative inline-flex h-2 w-2 rounded-full bg-signal" />
         </span>
         <span className="text-[10px] uppercase tracking-[0.2em] text-cream/70">
-          Systém online
+          Zážitky: online
         </span>
       </div>
 
