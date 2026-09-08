@@ -167,7 +167,7 @@ export default function ReservationApp() {
               <input
                 type="number"
                 min={1}
-                max={10}
+                max={6}
                 required
                 value={form.guests}
                 onChange={(e) =>

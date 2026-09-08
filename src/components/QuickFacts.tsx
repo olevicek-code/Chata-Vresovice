@@ -7,8 +7,8 @@ import ContourLines from "./ContourLines";
 
 const FACTS = [
   { icon: CalendarHeart, value: 2025, prefix: "", suffix: "", label: "Chata je naše od roku" },
-  { icon: Users, value: 10, prefix: "", suffix: "+", label: "hostů se pohodlně vejde" },
-  { icon: BedDouble, value: 4, prefix: "", suffix: "", label: "ložnice k dispozici" },
+  { icon: Users, value: 6, prefix: "", suffix: "", label: "hostů se pohodlně vejde" },
+  { icon: BedDouble, value: 2, prefix: "", suffix: "", label: "ložnice k dispozici" },
   { icon: MapPinned, value: 9, prefix: "", suffix: " km", label: "od centra Kyjova" },
 ];
 

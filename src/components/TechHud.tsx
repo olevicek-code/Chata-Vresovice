@@ -24,8 +24,6 @@ type Weather = {
   sunset: string;
 };
 
-type BookedRange = { startDate: string; endDate: string };
-
 function weatherIcon(code: number, isDay: boolean) {
   if (code === 0) return isDay ? Sun : Moon;
   if (code <= 2) return CloudSun;
@@ -48,13 +46,12 @@ function weatherLabel(code: number) {
   return "Načítám";
 }
 
-/** Live "instrument panel" over the hero: local time, real weather at the
- * cottage's coordinates, and the next free date pulled from the actual
- * reservations API — small proof that this isn't just a static mock. */
+/** Live "instrument panel" over the hero: local time and real weather at
+ * the cottage's coordinates — small proof that this isn't just a static
+ * mock. */
 export default function TechHud() {
   const [now, setNow] = useState<Date | null>(null);
   const [weather, setWeather] = useState<Weather | null>(null);
-  const [nextFree, setNextFree] = useState<string | null>(null);
 
   useEffect(() => {
     setNow(new Date());
@@ -76,33 +73,6 @@ export default function TechHud() {
           sunrise: data.daily.sunrise[0],
           sunset: data.daily.sunset[0],
         });
-      })
-      .catch(() => {});
-    return () => controller.abort();
-  }, []);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    fetch("/api/reservations", { signal: controller.signal })
-      .then((r) => r.json())
-      .then((data: { reservations: BookedRange[] }) => {
-        const booked = data.reservations ?? [];
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        for (let i = 0; i < 365; i++) {
-          const d = new Date(today);
-          d.setDate(d.getDate() + i);
-          const iso = d.toISOString().slice(0, 10);
-          const isBooked = booked.some((b) => iso >= b.startDate && iso < b.endDate);
-          if (!isBooked) {
-            setNextFree(
-              i === 0
-                ? "již dnes"
-                : d.toLocaleDateString("cs-CZ", { day: "numeric", month: "numeric" })
-            );
-            return;
-          }
-        }
       })
       .catch(() => {});
     return () => controller.abort();
@@ -156,7 +126,7 @@ export default function TechHud() {
 
       <div className="text-sm">
         <span className="text-cream/50">Volný termín:</span>{" "}
-        <span className="text-signal">{nextFree ?? "—"}</span>
+        <span className="text-signal">dle domluvy</span>
       </div>
     </div>
   );

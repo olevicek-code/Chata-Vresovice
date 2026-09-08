@@ -1,6 +1,7 @@
 import AnimatedSection from "./AnimatedSection";
 import AttractionsExplorer from "./AttractionsExplorer";
 import ChribyTrails from "./ChribyTrails";
+import LocationMap from "./LocationMap";
 
 export default function Surroundings() {
   return (
@@ -43,16 +44,9 @@ export default function Surroundings() {
         </AnimatedSection>
 
         <AnimatedSection delay={0.15} className="mt-12">
-          <div className="overflow-hidden rounded-2xl ring-1 ring-black/5">
-            <iframe
-              title="Mapa okolí Vřesovic u Kyjova"
-              className="h-80 w-full"
-              loading="lazy"
-              src="https://www.openstreetmap.org/export/embed.html?bbox=17.05%2C48.98%2C17.38%2C49.14&layer=mapnik&marker=49.059051%2C17.215106"
-            />
-          </div>
+          <LocationMap />
           <p className="mt-2 text-center text-xs text-stone/70">
-            Vřesovice u Kyjova (49.059, 17.215) – podhůří Chřibů, cca 9 km od
+            Chata Vřesovice, Vřesovice 569 – podhůří Chřibů, cca 9 km od
             Kyjova.
           </p>
         </AnimatedSection>

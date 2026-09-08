@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 
 const AMENITIES = [
-  { icon: BedDouble, label: "4 ložnice, lůžka pro až 10 osob" },
+  { icon: BedDouble, label: "2 ložnice, vhodné pro 4–6 osob" },
   { icon: UtensilsCrossed, label: "Plně vybavená kuchyně" },
   { icon: Flame, label: "Krb a venkovní ohniště" },
   { icon: Wifi, label: "Wi-Fi připojení" },
