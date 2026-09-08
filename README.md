@@ -56,10 +56,26 @@ má dvě důležitá omezení:
    opravdovou databázi (např. [Turso/libSQL](https://turso.tech/),
    [Vercel Postgres](https://vercel.com/storage/postgres), nebo Supabase) –
    logiku v `src/lib/reservations.ts` lze nahradit jen úpravou pár funkcí.
-2. **Žádosti se nyní jen ukládají**, nikam se neposílá e-mailové upozornění.
-   Až budete chtít, lze do `src/app/api/reservations/route.ts` snadno doplnit
-   odeslání e-mailu (např. přes [Resend](https://resend.com/) nebo podobnou
-   službu) při každé nové žádosti.
+2. **E-mailové upozornění na novou žádost** už web umí (`src/lib/email.ts`,
+   přes [Resend](https://resend.com/) – volané rovnou přes jejich HTTP API,
+   takže to nepřidává žádnou novou závislost do `package.json`). Aby to
+   fungovalo, nastavte ve Vercelu (Project → Settings → Environment
+   Variables):
+   - `RESEND_API_KEY` – vytvoříte zdarma na [resend.com](https://resend.com/)
+     (Sign up → API Keys → Create API Key). Volný tarif zvládne 100 e-mailů
+     denně / 3000 měsíčně, na rezervační formulář bohatě stačí.
+   - `RESERVATION_NOTIFY_EMAIL` – váš e-mail, kam chodí upozornění na novou
+     žádost. Bez tohoto nastavení se pošle jen potvrzovací e-mail hostovi,
+     vy žádné upozornění nedostanete.
+   - `RESERVATION_FROM_EMAIL` (nepovinné) – odesílací adresa. Bez nastavení
+     se použije sdílená adresa `onboarding@resend.dev`, která funguje hned
+     bez ověřování domény (ale hostům může přijít jako "podezřelejší"
+     odesílatel). Jakmile bude web na vlastní doméně, doporučujeme v Resendu
+     ověřit doménu (Domains → Add Domain, přidáte pár DNS záznamů) a nastavit
+     např. `Chata Vřesovice <rezervace@chatavresovice.cz>`.
+
+   Po změně proměnných je potřeba web ve Vercelu znovu nasadit (redeploy),
+   aby se nové hodnoty projevily.
 3. Rezervace se momentálně automaticky ukládají se stavem `pending` a nikde
    v UI nejde stav změnit na `confirmed`/`cancelled` – to je zatím potřeba
    dělat manuální úpravou `data/reservations.json`. Časem lze doplnit

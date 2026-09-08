@@ -6,6 +6,7 @@ import {
   saveReservations,
   type Reservation,
 } from "@/lib/reservations";
+import { sendReservationEmails } from "@/lib/email";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -84,6 +85,8 @@ export async function POST(request: NextRequest) {
   const reservations = await getReservations();
   reservations.push(reservation);
   await saveReservations(reservations);
+
+  await sendReservationEmails(reservation);
 
   return NextResponse.json({ reservation }, { status: 201 });
 }
