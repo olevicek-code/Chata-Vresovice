@@ -1,5 +1,6 @@
+import Image from "next/image";
 import AnimatedSection from "./AnimatedSection";
-import { Home, Sprout, ImagePlus } from "lucide-react";
+import { Home, Sprout } from "lucide-react";
 
 export default function History() {
   return (
@@ -41,14 +42,14 @@ export default function History() {
                 brzy sem doplníme vyprávění o tom, jak vše začalo, fotky z
                 předání a první dojmy.
               </p>
-              {/* Placeholder photo slot – nahraďte skutečnou fotkou z předání/koupě */}
-              <div className="mt-5 flex aspect-[16/9] w-full max-w-md items-center justify-center rounded-xl bg-gradient-to-br from-wood-light/25 via-forest/10 to-forest/20 text-center text-stone">
-                <div>
-                  <ImagePlus className="mx-auto h-8 w-8 text-forest" />
-                  <p className="mt-2 text-xs">
-                    Sem časem přibude fotka z koupě chaty
-                  </p>
-                </div>
+              <div className="relative mt-5 aspect-[4/3] w-full max-w-md overflow-hidden rounded-xl ring-1 ring-black/5">
+                <Image
+                  src="/images/chata-koupe-2025.jpg"
+                  alt="Chata Vřesovice v roce 2025, krátce po koupi"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 448px"
+                  className="object-cover"
+                />
               </div>
             </div>
           </AnimatedSection>
