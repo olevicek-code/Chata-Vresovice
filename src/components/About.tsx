@@ -2,7 +2,7 @@ import AnimatedSection from "./AnimatedSection";
 import {
   BedDouble,
   Users,
-  Wifi,
+  WifiOff,
   Flame,
   Trees,
   UtensilsCrossed,
@@ -14,10 +14,10 @@ const AMENITIES = [
   { icon: BedDouble, label: "2 ložnice, vhodné pro 4–6 osob" },
   { icon: UtensilsCrossed, label: "Plně vybavená kuchyně" },
   { icon: Flame, label: "Krb a venkovní ohniště" },
-  { icon: Wifi, label: "Wi-Fi připojení" },
+  { icon: WifiOff, label: "Momentálně bez Wi-Fi" },
   { icon: Car, label: "Vlastní parkování u chaty" },
   { icon: Dog, label: "Vstup se psem povolen" },
-  { icon: Trees, label: "Zahrada s výhledem do lesa" },
+  { icon: Trees, label: "Výhled do ovocného sadu" },
   { icon: Users, label: "Ideální pro rodiny i skupiny přátel" },
 ];
 
@@ -51,15 +51,18 @@ export default function About() {
 
           <AnimatedSection delay={0.1}>
             <p className="text-base leading-relaxed text-stone">
-              Chata Vřesovice je dřevěná roubenka obklopená vzrostlými
-              stromy, jen kousek od lesa a lučin plných zeleně. Ať přijedete
-              na víkend s rodinou, nebo na týden s partou přátel, najdete zde
-              dost místa k pohodlnému pobytu i klidu na oddech.
+              Chata Vřesovice je zděná chata v klidné chatové oblasti kousek
+              od lesa, obklopená loukami. Z okna i z terasy je pěkný výhled
+              do sousedního ovocného sadu – místo jako stvořené pro pomalá
+              rána s kávou a večery beze spěchu.
             </p>
             <p className="mt-4 text-base leading-relaxed text-stone">
-              Interiér kombinuje útulnost dřevěné chalupy s moderním
-              vybavením – od plně zařízené kuchyně po krb, u kterého lze
-              strávit dlouhé večery.
+              Uvnitř na vás čeká útulně zařízený interiér s plně vybavenou
+              kuchyní a krbem, u kterého se dá v chladnějších měsících
+              strávit dlouhý večer. Wi-Fi tu momentálně není, takže je to
+              skvělá příležitost si od internetu na pár dní odpočinout – ať
+              už přijedete na víkend s rodinou, nebo na týden s partou
+              přátel.
             </p>
 
             <ul className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">

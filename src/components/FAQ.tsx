@@ -20,7 +20,7 @@ const ITEMS = [
   },
   {
     q: "Je na chatě k dispozici Wi-Fi?",
-    a: "Ano, na chatě je Wi-Fi připojení, takže i při odpočinku v přírodě zůstanete v případě potřeby v kontaktu.",
+    a: "Momentálně ne – Wi-Fi na chatě zatím není. Bereme to ale spíš jako výhodu: je to skvělá příležitost si od telefonu a internetu na pár dní odpočinout.",
   },
   {
     q: "Jak funguje rezervace?",
