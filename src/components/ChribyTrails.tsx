@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { ChevronDown, MapPin } from "lucide-react";
 import AttractionMap from "./AttractionMap";
 
@@ -13,6 +14,8 @@ type TrailPoint = {
   /** true when the coordinate is an estimate from the surrounding trail
    * description rather than a verified map point. */
   approx?: boolean;
+  image?: string;
+  credit?: string;
 };
 
 const POINTS: TrailPoint[] = [
@@ -144,6 +147,8 @@ const POINTS: TrailPoint[] = [
     why: "Už trochu dál od Vřesovic, ale pořád v rámci Chřibů.",
     lat: 49.1073,
     lon: 17.311,
+    image: "/images/attractions/buchlov.jpg",
+    credit: "Wikimedia Commons, CC BY-SA 3.0",
   },
   {
     title: "Rozhledna Brdo",
@@ -151,6 +156,8 @@ const POINTS: TrailPoint[] = [
     why: "Kamenná rozhledna a nejvyšší bod celého pohoří.",
     lat: 49.1709,
     lon: 17.3086,
+    image: "/images/attractions/brdo.jpg",
+    credit: "Wikimedia Commons, CC BY-SA 3.0",
   },
   {
     title: "Čertovy kameny",
@@ -205,6 +212,22 @@ export default function ChribyTrails() {
                 <div className="overflow-hidden">
                   {isOpen && (
                     <div className="px-5 pb-5 pl-16">
+                      {point.image && (
+                        <div className="relative mb-3 aspect-[16/9] w-full overflow-hidden rounded-xl">
+                          <Image
+                            src={point.image}
+                            alt={point.title}
+                            fill
+                            sizes="512px"
+                            className="object-cover"
+                          />
+                        </div>
+                      )}
+                      {point.image && point.credit && (
+                        <p className="-mt-2 mb-2 text-right text-[10px] text-stone/40">
+                          {point.credit}
+                        </p>
+                      )}
                       <p className="text-sm leading-relaxed text-stone">
                         {point.why}
                       </p>

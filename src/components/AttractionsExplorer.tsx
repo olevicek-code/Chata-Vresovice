@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import {
   Mountain,
@@ -43,6 +44,11 @@ type Attraction = {
    * (e.g. a whole landscape or a village-level centroid) rather than the
    * exact spot – shown as a caveat under the map. */
   approx?: boolean;
+  image?: string;
+  credit?: string;
+  /** set when the photo isn't of this exact spot (e.g. a representative
+   * shot of the wider region) rather than the specific place. */
+  imageNote?: string;
 };
 
 const ATTRACTIONS: Attraction[] = [
@@ -56,6 +62,8 @@ const ATTRACTIONS: Attraction[] = [
       "Nejbližší větší město, správní centrum regionu. Dominantou je renesanční radnice se zvonicí z 2. poloviny 16. století a barokní kostel Nanebevzetí Panny Marie s bývalým kapucínským klášterem. V renesančním zámku sídlí Vlastivědské muzeum Kyjov s etnografickými sbírkami a vzácnou knihovnou. V centru je i aquapark a řada cyklotras začíná přímo ve městě.",
     lat: 49.0104,
     lon: 17.1225,
+    image: "/images/attractions/kyjov.jpg",
+    credit: "Wikimedia Commons, CC BY-SA 3.0",
   },
   {
     title: "Bukovanský mlýn s vyhlídkou",
@@ -67,6 +75,8 @@ const ATTRACTIONS: Attraction[] = [
       "Oblíbený cíl výletů mezi Bukovany a Ostrovánky. Kromě rozhledny ve tvaru větrného mlýna nabízí ubytování v moravských chaloupkách, restauraci s regionální kuchyní a místními víny, minigolf, ponyfarmu a bazén – ideální na celodenní výlet i s dětmi.",
     lat: 49.0403,
     lon: 17.0912,
+    image: "/images/attractions/bukovansky-mlyn.jpg",
+    credit: "Petr Dadák, Wikimedia Commons, CC BY-SA 2.0",
   },
   {
     title: "Kyjovský skalní hrádek",
@@ -111,6 +121,9 @@ const ATTRACTIONS: Attraction[] = [
     lat: 48.9778,
     lon: 17.0915,
     approx: true,
+    image: "/images/attractions/vinne-sklepy.jpg",
+    credit: "Wikimedia Commons, CC BY-SA 4.0",
+    imageNote: "ilustrační foto – vinné sklepy Petrov-Plže",
   },
   {
     title: "Zámek Milotice",
@@ -121,6 +134,8 @@ const ATTRACTIONS: Attraction[] = [
       "Jeden z nejkrásnějších barokních zámků na Moravě, přestavěný do dnešní podoby začátkem 18. století. Prohlídková trasa vede 17 pokoji a vypráví příběh poslední hraběcí dcery. Areál doplňuje jízdárna, dvě oranžerie a rozlehlý francouzský park – v létě zde bývá i letní kino.",
     lat: 48.9595,
     lon: 17.1377,
+    image: "/images/attractions/zamek-milotice.jpg",
+    credit: "Wikimedia Commons, CC BY-SA 3.0",
   },
 ];
 
@@ -162,22 +177,35 @@ export default function AttractionsExplorer() {
               animate={{ opacity: 1, y: 0 }}
               whileHover={{ y: -4 }}
               onClick={() => setSelected(a)}
-              className="h-full rounded-2xl bg-background p-6 text-left shadow-sm ring-1 ring-black/5 transition-shadow hover:shadow-md"
+              className="flex h-full flex-col overflow-hidden rounded-2xl bg-background text-left shadow-sm ring-1 ring-black/5 transition-shadow hover:shadow-md"
             >
-              <Icon className="h-8 w-8 text-forest" />
-              <h3 className="mt-4 font-display text-lg text-forest-dark">
-                {a.title}
-              </h3>
-              <p className="mt-1 flex items-center gap-1 text-xs font-medium text-wood">
-                <MapPin className="h-3.5 w-3.5" />
-                {a.distance}
-              </p>
-              <p className="mt-2 text-sm leading-relaxed text-stone">
-                {a.short}
-              </p>
-              <span className="mt-3 inline-block text-xs font-semibold text-forest underline-offset-2 hover:underline">
-                Zobrazit více
-              </span>
+              {a.image ? (
+                <div className="relative aspect-[4/3] w-full shrink-0">
+                  <Image
+                    src={a.image}
+                    alt={a.title}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover"
+                  />
+                </div>
+              ) : null}
+              <div className="flex flex-1 flex-col p-6">
+                {!a.image && <Icon className="h-8 w-8 text-forest" />}
+                <h3 className={`font-display text-lg text-forest-dark ${a.image ? "" : "mt-4"}`}>
+                  {a.title}
+                </h3>
+                <p className="mt-1 flex items-center gap-1 text-xs font-medium text-wood">
+                  <MapPin className="h-3.5 w-3.5" />
+                  {a.distance}
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-stone">
+                  {a.short}
+                </p>
+                <span className="mt-3 inline-block text-xs font-semibold text-forest underline-offset-2 hover:underline">
+                  Zobrazit více
+                </span>
+              </div>
             </motion.button>
           );
         })}
@@ -201,8 +229,27 @@ export default function AttractionsExplorer() {
             >
               <X className="h-5 w-5" />
             </button>
-            <Trees className="h-8 w-8 text-forest" />
-            <h3 className="mt-3 font-display text-2xl text-forest-dark">
+
+            {selected.image && (
+              <div className="relative mb-4 aspect-[16/9] w-full overflow-hidden rounded-xl">
+                <Image
+                  src={selected.image}
+                  alt={selected.title}
+                  fill
+                  sizes="512px"
+                  className="object-cover"
+                />
+              </div>
+            )}
+            {selected.image && (selected.credit || selected.imageNote) && (
+              <p className="-mt-3 mb-3 text-right text-[10px] text-stone/40">
+                {selected.imageNote ? `${selected.imageNote} · ` : ""}
+                {selected.credit}
+              </p>
+            )}
+
+            {!selected.image && <Trees className="h-8 w-8 text-forest" />}
+            <h3 className={`font-display text-2xl text-forest-dark ${selected.image ? "" : "mt-3"}`}>
               {selected.title}
             </h3>
             <p className="mt-1 flex items-center gap-1 text-xs font-medium text-wood">
