@@ -17,7 +17,7 @@ const AMENITIES = [
   { icon: WifiOff, label: "Momentálně bez Wi-Fi" },
   { icon: Car, label: "Vlastní parkování u chaty" },
   { icon: Dog, label: "Vstup se psem povolen" },
-  { icon: Trees, label: "Výhled do ovocného sadu" },
+  { icon: Trees, label: "Výhled do vlastního ovocného sadu" },
   { icon: Users, label: "Ideální pro rodiny i skupiny přátel" },
 ];
 
@@ -53,7 +53,7 @@ export default function About() {
             <p className="text-base leading-relaxed text-stone">
               Chata Vřesovice je zděná chata v klidné chatové oblasti kousek
               od lesa, obklopená loukami. Z okna i z terasy je pěkný výhled
-              do sousedního ovocného sadu – místo jako stvořené pro pomalá
+              do vlastního ovocného sadu – místo jako stvořené pro pomalá
               rána s kávou a večery beze spěchu.
             </p>
             <p className="mt-4 text-base leading-relaxed text-stone">
