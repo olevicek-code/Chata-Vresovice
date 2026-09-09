@@ -45,7 +45,9 @@ export default function RouteMap({ stops }: { stops: RouteStop[] }) {
 
         const chataPoint: LatLngTuple = [CHATA.lat, CHATA.lon];
         const stopPoints: LatLngTuple[] = stops.map((s) => [s.lat, s.lon]);
-        const allPoints = [chataPoint, ...stopPoints];
+        // Loop back to the chata at the end so the drawn route matches the
+        // round-trip distance shown next to the map (there and back).
+        const routePoints = [chataPoint, ...stopPoints, chataPoint];
 
         L.marker(chataPoint, { icon: pinIcon(L, "🏡", "bg-forest-dark") })
           .addTo(map)
@@ -59,7 +61,7 @@ export default function RouteMap({ stops }: { stops: RouteStop[] }) {
             .bindPopup?.(s.label);
         });
 
-        L.polyline(allPoints, {
+        L.polyline(routePoints, {
           color: "#4a6b4a",
           weight: 3,
           opacity: 0.85,
@@ -67,7 +69,7 @@ export default function RouteMap({ stops }: { stops: RouteStop[] }) {
           lineCap: "round",
         }).addTo(map);
 
-        map.fitBounds(allPoints, { padding: [42, 42] });
+        map.fitBounds(routePoints, { padding: [42, 42] });
       })
       .catch(() => {
         if (!cancelled) setFailed(true);

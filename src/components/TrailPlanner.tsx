@@ -22,14 +22,15 @@ export default function TrailPlanner() {
   const stops = useMemo(() => selected.map((i) => CHRIBY_POINTS[i]), [selected]);
 
   const legs = useMemo(() => {
-    const points = [CHATA, ...stops];
+    if (stops.length === 0) return [];
+    const points = [CHATA, ...stops, CHATA];
     const result: { from: string; to: string; km: number }[] = [];
     for (let i = 0; i < points.length - 1; i++) {
       const a = points[i];
       const b = points[i + 1];
       result.push({
         from: i === 0 ? "Chata" : stops[i - 1].title,
-        to: stops[i].title,
+        to: i === points.length - 2 ? "Chata" : stops[i].title,
         km: haversineKm(a, b),
       });
     }
@@ -78,7 +79,8 @@ export default function TrailPlanner() {
         <div className="mt-6">
           <div className="mb-3 flex items-center justify-between">
             <p className="text-sm font-medium text-forest-dark">
-              Trasa: {stops.length} {stops.length === 1 ? "zastávka" : "zastávky"} ·{" "}
+              Trasa tam a zpět: {stops.length}{" "}
+              {stops.length === 1 ? "zastávka" : "zastávky"} ·{" "}
               <span className="text-wood">{totalKm.toFixed(1)} km vzdušnou čarou</span>
             </p>
             <button
