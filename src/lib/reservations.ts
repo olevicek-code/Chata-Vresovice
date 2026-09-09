@@ -1,16 +1,17 @@
 /**
- * Reservation storage via Upstash Redis's HTTP REST API (plain fetch, no
- * npm dependency) — Vercel's serverless functions have a read-only
- * filesystem in production, so the previous "save to a local JSON file"
- * approach could never actually persist a reservation there (every write
- * threw EROFS). All reservations live under one Redis key as a single
- * JSON blob, which keeps this file's shape identical to the old one.
+ * Reservation storage via Vercel's native Redis add-on (node-redis client,
+ * connected with the REDIS_URL env var it provides). Needed because
+ * Vercel's serverless functions have a read-only filesystem in
+ * production, so the previous "save to a local JSON file" approach could
+ * never actually persist a reservation there (every write threw EROFS).
+ * All reservations live under one Redis key as a single JSON blob, which
+ * keeps this file's shape identical to the old one.
  *
- * Set one of these env var pairs in Vercel (Project → Settings →
- * Environment Variables), whichever your storage integration provides:
- * - KV_REST_API_URL + KV_REST_API_TOKEN (Vercel's own KV/Upstash storage)
- * - UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN (Upstash directly)
+ * Set `REDIS_URL` in Vercel (Project → Storage → create/connect a Redis
+ * database → it's added automatically) for this to work.
  */
+
+import { createClient, type RedisClientType } from "redis";
 
 export type Reservation = {
   id: string;
@@ -25,35 +26,42 @@ export type Reservation = {
   createdAt: string;
 };
 
-const REDIS_URL = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-const REDIS_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
 const REDIS_KEY = "chata-vresovice:reservations";
 
-async function redisCommand(command: (string | number)[]): Promise<unknown> {
-  if (!REDIS_URL || !REDIS_TOKEN) {
-    throw new Error(
-      "Úložiště rezervací není nastavené – chybí KV_REST_API_URL/KV_REST_API_TOKEN (nebo UPSTASH_REDIS_REST_URL/UPSTASH_REDIS_REST_TOKEN) v proměnných prostředí."
-    );
+let client: RedisClientType | null = null;
+let connecting: Promise<RedisClientType> | null = null;
+
+async function getClient(): Promise<RedisClientType> {
+  if (client?.isOpen) return client;
+
+  if (!connecting) {
+    const url = process.env.REDIS_URL;
+    if (!url) {
+      throw new Error(
+        "Úložiště rezervací není nastavené – chybí REDIS_URL v proměnných prostředí."
+      );
+    }
+    const c: RedisClientType = createClient({ url });
+    c.on("error", (err) => console.error("[redis] client error:", err));
+    connecting = c
+      .connect()
+      .then(() => {
+        client = c;
+        return c;
+      })
+      .catch((err) => {
+        connecting = null;
+        throw err;
+      });
   }
-  const res = await fetch(REDIS_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${REDIS_TOKEN}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(command),
-    cache: "no-store",
-  });
-  if (!res.ok) {
-    throw new Error(`Chyba úložiště rezervací (${res.status}): ${await res.text()}`);
-  }
-  const data = (await res.json()) as { result: unknown };
-  return data.result;
+
+  return connecting;
 }
 
 export async function getReservations(): Promise<Reservation[]> {
-  const raw = await redisCommand(["GET", REDIS_KEY]);
-  if (typeof raw !== "string") return [];
+  const redis = await getClient();
+  const raw = await redis.get(REDIS_KEY);
+  if (!raw) return [];
   try {
     return JSON.parse(raw) as Reservation[];
   } catch {
@@ -62,7 +70,8 @@ export async function getReservations(): Promise<Reservation[]> {
 }
 
 export async function saveReservations(reservations: Reservation[]) {
-  await redisCommand(["SET", REDIS_KEY, JSON.stringify(reservations)]);
+  const redis = await getClient();
+  await redis.set(REDIS_KEY, JSON.stringify(reservations));
 }
 
 export function rangesOverlap(

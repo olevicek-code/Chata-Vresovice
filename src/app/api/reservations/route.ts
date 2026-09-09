@@ -101,7 +101,8 @@ export async function POST(request: NextRequest) {
     console.error("[reservations] POST failed:", err);
     return NextResponse.json(
       {
-        error: "DEBUG: " + (err instanceof Error ? err.message : String(err)),
+        error:
+          "Nepodařilo se uložit rezervaci kvůli technické chybě na serveru. Zkuste to prosím znovu, nebo nás kontaktujte přímo.",
       },
       { status: 500 }
     );

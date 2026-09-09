@@ -46,23 +46,23 @@ nahradit:
 
 ## Rezervační systém – jak to funguje a nastavení
 
-Rezervace se ukládají do Redis úložiště přes Upstash's HTTP REST API
-(`src/lib/reservations.ts`, volané rovnou přes `fetch` – žádná nová
-závislost v `package.json`). **Toto je nutné nastavit, jinak formulář
-rezervace vůbec nefunguje** – Vercel má v provozu souborový systém jen
-pro čtení, takže původní řešení "ukládat do JSON souboru" nikdy nemohlo
-na Vercelu zapisovat (končilo chybou `EROFS: read-only file system`).
+Rezervace se ukládají do Vercelu vlastního Redis úložiště přes
+[`node-redis`](https://github.com/redis/node-redis) (`src/lib/reservations.ts`).
+**Toto je nutné nastavit, jinak formulář rezervace vůbec nefunguje** –
+Vercel má v provozu souborový systém jen pro čtení, takže původní řešení
+"ukládat do JSON souboru" nikdy nemohlo na Vercelu zapisovat (končilo
+chybou `EROFS: read-only file system`).
 
 Nastavení (stačí jednou):
 
 1. Ve Vercelu otevřete projekt → záložka **Storage** → **Create Database**
-   → vyberte **KV** (Redis, poskytuje Upstash) → připojte k projektu.
-   Vercel sám doplní proměnné `KV_REST_API_URL` a `KV_REST_API_TOKEN`.
-   *(Alternativa: účet přímo na [upstash.com](https://upstash.com/) zdarma,
-   pak ručně přidat `UPSTASH_REDIS_REST_URL` a `UPSTASH_REDIS_REST_TOKEN` do
-   Environment Variables – kód podporuje obě varianty.)*
-2. Po připojení úložiště udělejte redeploy (Vercel → Deployments → "..."
-   → Redeploy), ať se nové proměnné projeví.
+   → vyberte **Redis**.
+2. Na stránce databáze klikněte na **Connect to Project** a vyberte tento
+   projekt (`chata-vresovice`) – teprve tímto krokem se přidá proměnná
+   `REDIS_URL` do Environment Variables. Samotné vytvoření databáze bez
+   tohoto kroku nestačí.
+3. Udělejte redeploy (Vercel → Deployments → "..." → Redeploy), ať se
+   nová proměnná projeví.
 
 Bez tohoto nastavení `POST /api/reservations` vrátí chybu 500 a nikomu se
 nic neuloží ani neodešle.
