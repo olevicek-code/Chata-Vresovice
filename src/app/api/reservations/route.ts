@@ -11,17 +11,24 @@ import { sendReservationEmails } from "@/lib/email";
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 export async function GET() {
-  const reservations = await getReservations();
-  // Only expose the info needed to render a calendar / avoid double booking.
-  const publicView = reservations
-    .filter((r) => r.status !== "cancelled")
-    .map((r) => ({
-      id: r.id,
-      startDate: r.startDate,
-      endDate: r.endDate,
-      status: r.status,
-    }));
-  return NextResponse.json({ reservations: publicView });
+  try {
+    const reservations = await getReservations();
+    // Only expose the info needed to render a calendar / avoid double booking.
+    const publicView = reservations
+      .filter((r) => r.status !== "cancelled")
+      .map((r) => ({
+        id: r.id,
+        startDate: r.startDate,
+        endDate: r.endDate,
+        status: r.status,
+      }));
+    return NextResponse.json({ reservations: publicView });
+  } catch (err) {
+    console.error("[reservations] GET failed:", err);
+    // Fail soft: an empty list still lets the calendar render, just
+    // without disabled dates, instead of breaking the whole page.
+    return NextResponse.json({ reservations: [] });
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -61,28 +68,28 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const conflict = await hasConflict(startDate, endDate);
-  if (conflict) {
-    return NextResponse.json(
-      { error: "Vybraný termín je již obsazený. Zvolte prosím jiné datum." },
-      { status: 409 }
-    );
-  }
-
-  const reservation: Reservation = {
-    id: generateId(),
-    name: name.trim(),
-    email: email.trim(),
-    phone: typeof phone === "string" ? phone.trim() : undefined,
-    startDate,
-    endDate,
-    guests: typeof guests === "number" && guests > 0 ? guests : 1,
-    note: typeof note === "string" ? note.trim() : undefined,
-    status: "pending",
-    createdAt: new Date().toISOString(),
-  };
-
   try {
+    const conflict = await hasConflict(startDate, endDate);
+    if (conflict) {
+      return NextResponse.json(
+        { error: "Vybraný termín je již obsazený. Zvolte prosím jiné datum." },
+        { status: 409 }
+      );
+    }
+
+    const reservation: Reservation = {
+      id: generateId(),
+      name: name.trim(),
+      email: email.trim(),
+      phone: typeof phone === "string" ? phone.trim() : undefined,
+      startDate,
+      endDate,
+      guests: typeof guests === "number" && guests > 0 ? guests : 1,
+      note: typeof note === "string" ? note.trim() : undefined,
+      status: "pending",
+      createdAt: new Date().toISOString(),
+    };
+
     const reservations = await getReservations();
     reservations.push(reservation);
     await saveReservations(reservations);
@@ -91,11 +98,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ reservation }, { status: 201 });
   } catch (err) {
-    // TEMPORARY verbose error for debugging a production 500 — revert once
-    // the root cause is found.
     console.error("[reservations] POST failed:", err);
     return NextResponse.json(
-      { error: "DEBUG: " + (err instanceof Error ? err.message : String(err)) },
+      {
+        error:
+          "Nepodařilo se uložit rezervaci kvůli technické chybě na serveru. Zkuste to prosím znovu, nebo nás kontaktujte přímo.",
+      },
       { status: 500 }
     );
   }

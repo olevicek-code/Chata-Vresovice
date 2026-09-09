@@ -44,42 +44,58 @@ nahradit:
 - popisné texty a vybavení chaty v `src/components/About.tsx` a
   `src/components/Surroundings.tsx`.
 
-## Rezervační systém – jak to funguje a omezení
+## Rezervační systém – jak to funguje a nastavení
 
-Rezervace se ukládají do souboru `data/reservations.json`. To je jednoduché
-řešení vhodné pro první fázi (např. rezervace jen pro rodinu a přátele), ale
-má dvě důležitá omezení:
+Rezervace se ukládají do Redis úložiště přes Upstash's HTTP REST API
+(`src/lib/reservations.ts`, volané rovnou přes `fetch` – žádná nová
+závislost v `package.json`). **Toto je nutné nastavit, jinak formulář
+rezervace vůbec nefunguje** – Vercel má v provozu souborový systém jen
+pro čtení, takže původní řešení "ukládat do JSON souboru" nikdy nemohlo
+na Vercelu zapisovat (končilo chybou `EROFS: read-only file system`).
 
-1. **Serverless hosting (např. Vercel) má efemérní souborový systém** – po
-   každém nasazení nebo restartu funkce se soubor vrátí do stavu z repozitáře.
-   Pro produkční provoz s reálnými hosty proto doporučujeme přejít na
-   opravdovou databázi (např. [Turso/libSQL](https://turso.tech/),
-   [Vercel Postgres](https://vercel.com/storage/postgres), nebo Supabase) –
-   logiku v `src/lib/reservations.ts` lze nahradit jen úpravou pár funkcí.
-2. **E-mailové upozornění na novou žádost** už web umí (`src/lib/email.ts`,
-   přes [Resend](https://resend.com/) – volané rovnou přes jejich HTTP API,
-   takže to nepřidává žádnou novou závislost do `package.json`). Aby to
-   fungovalo, nastavte ve Vercelu (Project → Settings → Environment
-   Variables):
-   - `RESEND_API_KEY` – vytvoříte zdarma na [resend.com](https://resend.com/)
-     (Sign up → API Keys → Create API Key). Volný tarif zvládne 100 e-mailů
-     denně / 3000 měsíčně, na rezervační formulář bohatě stačí.
-   - `RESERVATION_NOTIFY_EMAIL` – váš e-mail, kam chodí upozornění na novou
-     žádost. Bez tohoto nastavení se pošle jen potvrzovací e-mail hostovi,
-     vy žádné upozornění nedostanete.
-   - `RESERVATION_FROM_EMAIL` (nepovinné) – odesílací adresa. Bez nastavení
-     se použije sdílená adresa `onboarding@resend.dev`, která funguje hned
-     bez ověřování domény (ale hostům může přijít jako "podezřelejší"
-     odesílatel). Jakmile bude web na vlastní doméně, doporučujeme v Resendu
-     ověřit doménu (Domains → Add Domain, přidáte pár DNS záznamů) a nastavit
-     např. `Chata Vřesovice <rezervace@chatavresovice.cz>`.
+Nastavení (stačí jednou):
 
-   Po změně proměnných je potřeba web ve Vercelu znovu nasadit (redeploy),
-   aby se nové hodnoty projevily.
-3. Rezervace se momentálně automaticky ukládají se stavem `pending` a nikde
-   v UI nejde stav změnit na `confirmed`/`cancelled` – to je zatím potřeba
-   dělat manuální úpravou `data/reservations.json`. Časem lze doplnit
-   jednoduchou administraci chráněnou heslem.
+1. Ve Vercelu otevřete projekt → záložka **Storage** → **Create Database**
+   → vyberte **KV** (Redis, poskytuje Upstash) → připojte k projektu.
+   Vercel sám doplní proměnné `KV_REST_API_URL` a `KV_REST_API_TOKEN`.
+   *(Alternativa: účet přímo na [upstash.com](https://upstash.com/) zdarma,
+   pak ručně přidat `UPSTASH_REDIS_REST_URL` a `UPSTASH_REDIS_REST_TOKEN` do
+   Environment Variables – kód podporuje obě varianty.)*
+2. Po připojení úložiště udělejte redeploy (Vercel → Deployments → "..."
+   → Redeploy), ať se nové proměnné projeví.
+
+Bez tohoto nastavení `POST /api/reservations` vrátí chybu 500 a nikomu se
+nic neuloží ani neodešle.
+
+### E-mailové upozornění na novou žádost
+
+Web umí i tohle (`src/lib/email.ts`, přes [Resend](https://resend.com/) –
+volané rovnou přes jejich HTTP API, žádná nová závislost). Nastavte ve
+Vercelu (Project → Settings → Environment Variables):
+
+- `RESEND_API_KEY` – vytvoříte zdarma na [resend.com](https://resend.com/)
+  (Sign up → API Keys → Create API Key). Volný tarif zvládne 100 e-mailů
+  denně / 3000 měsíčně, na rezervační formulář bohatě stačí.
+- `RESERVATION_NOTIFY_EMAIL` – váš e-mail, kam chodí upozornění na novou
+  žádost. Bez tohoto nastavení se pošle jen potvrzovací e-mail hostovi, vy
+  žádné upozornění nedostanete.
+- `RESERVATION_FROM_EMAIL` (nepovinné) – odesílací adresa. Bez nastavení
+  se použije sdílená adresa `onboarding@resend.dev`, která funguje hned
+  bez ověřování domény (ale hostům může přijít jako "podezřelejší"
+  odesílatel). Jakmile bude web na vlastní doméně, doporučujeme v Resendu
+  ověřit doménu (Domains → Add Domain, přidáte pár DNS záznamů) a nastavit
+  např. `Chata Vřesovice <rezervace@chatavresovice.cz>`.
+
+Po změně libovolných proměnných prostředí je potřeba web ve Vercelu znovu
+nasadit (redeploy), aby se nové hodnoty projevily.
+
+### Stav rezervace (pending/confirmed/cancelled)
+
+Rezervace se momentálně automaticky ukládají se stavem `pending` a nikde
+v UI nejde stav změnit na `confirmed`/`cancelled` – to je zatím potřeba
+dělat přímo v Redis úložišti (Vercel → Storage → otevřít databázi → Data
+Browser, klíč `chata-vresovice:reservations` obsahuje celé pole jako
+JSON). Časem lze doplnit jednoduchou administraci chráněnou heslem.
 
 ## Spuštění lokálně
 
@@ -101,4 +117,5 @@ npm run lint
 
 Nejjednodušší je nasazení na [Vercel](https://vercel.com/new) – po připojení
 tohoto GitHub repozitáře se web nasadí automaticky při každém push do `main`.
-Pamatujte na omezení souborového úložiště zmíněné výše.
+Nezapomeňte nastavit KV úložiště a Resend podle sekce o rezervačním systému
+výše, jinak formulář na `/rezervace` nebude fungovat.
