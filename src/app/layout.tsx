@@ -13,10 +13,27 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
+const SITE_TITLE = "Chata Vřesovice | Odpočinek uprostřed přírody";
+const SITE_DESCRIPTION =
+  "Chata Vřesovice – rodinná chata pro nezapomenutelné chvíle s rodinou a přáteli. Prohlédněte si okolí, fotogalerii a rezervujte si svůj termín.";
+
 export const metadata: Metadata = {
-  title: "Chata Vřesovice | Odpočinek uprostřed přírody",
-  description:
-    "Chata Vřesovice – rodinná chata pro nezapomenutelné chvíle s rodinou a přáteli. Prohlédněte si okolí, fotogalerii a rezervujte si svůj termín.",
+  metadataBase: new URL("https://www.chatavresovice.cz"),
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
+  openGraph: {
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    url: "https://www.chatavresovice.cz",
+    siteName: "Chata Vřesovice",
+    locale: "cs_CZ",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

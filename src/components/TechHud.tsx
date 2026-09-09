@@ -35,6 +35,20 @@ function weatherIcon(code: number, isDay: boolean) {
   return Cloud;
 }
 
+/** Icon color shifts with the actual condition – amber sun, blue rain,
+ * pale cyan snow, grey fog/cloud – so the HUD visibly reacts instead of
+ * just swapping a same-colored glyph. */
+function weatherColor(code: number, isDay: boolean) {
+  if (code === 0) return isDay ? "#fbbf24" : "#a5b4fc";
+  if (code <= 2) return isDay ? "#f2c675" : "#93c5fd";
+  if (code === 3) return "#cbd5c8";
+  if (code >= 45 && code <= 48) return "#9ca3af";
+  if (code >= 51 && code <= 67) return "#5eb8e0";
+  if (code >= 71 && code <= 86) return "#d6ecf5";
+  if (code >= 95) return "#f0a35e";
+  return "#55e0a8";
+}
+
 function weatherLabel(code: number) {
   if (code === 0) return "Jasno";
   if (code <= 2) return "Polojasno";
@@ -82,6 +96,7 @@ export default function TechHud() {
   const sunset = weather ? new Date(weather.sunset) : null;
   const isDay = now && sunrise && sunset ? now >= sunrise && now < sunset : true;
   const Icon = weather ? weatherIcon(weather.code, isDay) : Radio;
+  const iconColor = weather ? weatherColor(weather.code, isDay) : "#55e0a8";
 
   return (
     <div className="glass-panel signal-glow relative z-10 flex flex-wrap items-center gap-x-6 gap-y-3 rounded-2xl px-5 py-4 font-mono text-cream">
@@ -98,7 +113,7 @@ export default function TechHud() {
       <div className="h-6 w-px bg-cream/15" />
 
       <div className="flex items-center gap-2">
-        <Icon className="h-4 w-4 text-signal" />
+        <Icon className="h-4 w-4 transition-colors" style={{ color: iconColor }} />
         <span className="text-sm tabular-nums">
           {weather ? `${weather.temp}°C` : "—"}
         </span>
