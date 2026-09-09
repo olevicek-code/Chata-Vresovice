@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import ScrollProgress from "@/components/ScrollProgress";
 import BackToTop from "@/components/BackToTop";
 import CustomCursor from "@/components/CustomCursor";
+import ConsoleEasterEgg from "@/components/ConsoleEasterEgg";
 import "./globals.css";
 
 const jetbrainsMono = JetBrains_Mono({
@@ -54,6 +55,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           }}
         />
         <CustomCursor />
+        <ConsoleEasterEgg />
         <ScrollProgress />
         {/* faint grain texture over the whole page for a more tactile,
             natural feel instead of flat digital color fields */}
