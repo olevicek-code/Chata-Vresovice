@@ -6,6 +6,7 @@ import Surroundings from "@/components/Surroundings";
 import Gallery from "@/components/Gallery";
 import FAQ from "@/components/FAQ";
 import WaveDivider from "@/components/WaveDivider";
+import HiddenFox from "@/components/HiddenFox";
 import { CHATA } from "@/lib/leaflet";
 
 const STRUCTURED_DATA = {
@@ -49,6 +50,7 @@ export default function Home() {
       <Gallery />
       <FAQ />
       <WaveDivider bg="var(--background)" wave="var(--forest-dark)" />
+      <HiddenFox />
     </>
   );
 }
