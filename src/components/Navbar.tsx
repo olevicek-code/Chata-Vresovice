@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Menu, X, TreePine } from "lucide-react";
 import AmbientSound from "./AmbientSound";
@@ -16,9 +17,16 @@ const HOME_LINKS = [
 ];
 
 export default function Navbar() {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState<string | null>(null);
+  // Only the homepage has a dark video hero worth a transparent navbar
+  // over it; every other page can start dark now (theme toggle), so a
+  // see-through bar there would sit over dark content with unreadable
+  // dark-on-dark text. Those pages just get the solid bar from the start.
+  const solid = scrolled || !isHome;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -54,7 +62,7 @@ export default function Navbar() {
   return (
     <header
       className={`sticky top-0 z-50 transition-colors duration-300 ${
-        scrolled
+        solid
           ? "bg-cream/95 backdrop-blur-sm shadow-sm"
           : "bg-transparent"
       }`}
