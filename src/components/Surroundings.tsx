@@ -1,6 +1,7 @@
 import AnimatedSection from "./AnimatedSection";
 import AttractionsExplorer from "./AttractionsExplorer";
 import ChribyTrails from "./ChribyTrails";
+import TrailPlanner from "./TrailPlanner";
 import LocationMap from "./LocationMap";
 
 export default function Surroundings() {
@@ -40,6 +41,9 @@ export default function Surroundings() {
           </p>
           <div className="mt-6">
             <ChribyTrails />
+          </div>
+          <div className="mt-6">
+            <TrailPlanner />
           </div>
         </AnimatedSection>
 

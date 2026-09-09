@@ -66,9 +66,14 @@ export default function Footer() {
           </ul>
         </div>
       </div>
-      <div className="border-t border-cream/10 px-5 py-5 text-center text-xs text-cream/50">
-        © {new Date().getFullYear()} Chata Vřesovice. Vytvořeno s láskou k
-        přírodě.
+      <div className="flex flex-col items-center justify-center gap-2 border-t border-cream/10 px-5 py-5 text-center text-xs text-cream/50 sm:flex-row sm:justify-between">
+        <span>
+          © {new Date().getFullYear()} Chata Vřesovice. Vytvořeno s láskou k
+          přírodě.
+        </span>
+        <Link href="/admin" className="text-cream/30 hover:text-cream/60">
+          Administrace
+        </Link>
       </div>
     </footer>
   );

@@ -6,10 +6,13 @@ Prezentační a rezervační web pro chatu Vřesovice, postavený na
 ## Co web obsahuje
 
 - **Úvodní stránka (`/`)** – hero sekce, sekce *O chatě* (popis + vybavení),
-  *Okolí* (aktivity + orientační mapa), *Galerie* (náhledy s lightboxem) a
+  *Okolí* (aktivity, 20 tipů na túru po Chřibech, plánovač vlastní trasy
+  s mapou a orientační vzdáleností), *Galerie* (náhledy s lightboxem) a
   patička s kontaktem.
 - **Rezervace (`/rezervace`)** – interaktivní kalendář (obsazené dny jsou
   needitovatelné) a formulář pro odeslání žádosti o rezervaci.
+- **Administrace (`/admin`)** – heslem chráněná správa rezervací (změna
+  stavu, mazání), viz sekce níže.
 - **API (`/api/reservations`)** – `GET` vrací seznam obsazených termínů,
   `POST` přijme novou žádost o rezervaci a ověří, že se nepřekrývá s
   existující rezervací.
@@ -89,13 +92,15 @@ Vercelu (Project → Settings → Environment Variables):
 Po změně libovolných proměnných prostředí je potřeba web ve Vercelu znovu
 nasadit (redeploy), aby se nové hodnoty projevily.
 
-### Stav rezervace (pending/confirmed/cancelled)
+### Administrace rezervací (`/admin`)
 
-Rezervace se momentálně automaticky ukládají se stavem `pending` a nikde
-v UI nejde stav změnit na `confirmed`/`cancelled` – to je zatím potřeba
-dělat přímo v Redis úložišti (Vercel → Storage → otevřít databázi → Data
-Browser, klíč `chata-vresovice:reservations` obsahuje celé pole jako
-JSON). Časem lze doplnit jednoduchou administraci chráněnou heslem.
+Nové rezervace se ukládají se stavem `pending`. Na `/admin` (odkaz je i
+v patičce webu) jde po přihlášení heslem u každé rezervace stav změnit na
+`confirmed`/`cancelled`, nebo ji rovnou smazat.
+
+Nastavení: v proměnných prostředí přidejte `ADMIN_PASSWORD` (heslo dle
+vlastního výběru) a udělejte redeploy. Bez nastavené proměnné se na
+`/admin` nikdo nepřihlásí. Přihlášení drží cookie 30 dní.
 
 ## Spuštění lokálně
 

@@ -7,10 +7,6 @@ import AnimatedSection from "./AnimatedSection";
 
 const ITEMS = [
   {
-    q: "V kolik hodin je příjezd a odjezd?",
-    a: "Standardně počítáme s příjezdem od 15:00 a odjezdem do 10:00, ale u rodiny a přátel jsme samozřejmě flexibilní – stačí se domluvit předem přes rezervační formulář nebo telefonicky.",
-  },
-  {
     q: "Je možné vzít s sebou psa?",
     a: "Ano, vstup se psem je u nás povolený. Dejte nám prosím vědět předem, ať víme, kolik chlupatých hostů se na chatu chystá.",
   },
