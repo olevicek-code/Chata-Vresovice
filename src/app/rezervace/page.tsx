@@ -5,6 +5,9 @@ import ReservationApp from "@/components/ReservationApp";
 export const metadata: Metadata = {
   title: "Rezervace | Chata Vřesovice",
   description: "Vyberte si termín a odešlete žádost o rezervaci Chaty Vřesovice.",
+  alternates: {
+    canonical: "/rezervace",
+  },
 };
 
 export default function RezervacePage() {

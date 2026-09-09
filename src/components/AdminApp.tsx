@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { format, parseISO } from "date-fns";
-import { CalendarPlus, Lock, LogOut, RefreshCw, Trash2 } from "lucide-react";
+import { CalendarPlus, Ban, Lock, LogOut, RefreshCw, Trash2, X } from "lucide-react";
 import type { Reservation } from "@/lib/reservations";
 
 type ViewState = "checking" | "login" | "ready";
@@ -36,6 +36,14 @@ export default function AdminApp() {
   const [listError, setListError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
+
+  const [showBlockForm, setShowBlockForm] = useState(false);
+  const [blockLabel, setBlockLabel] = useState("");
+  const [blockStart, setBlockStart] = useState("");
+  const [blockEnd, setBlockEnd] = useState("");
+  const [blockNote, setBlockNote] = useState("");
+  const [blockError, setBlockError] = useState<string | null>(null);
+  const [blockBusy, setBlockBusy] = useState(false);
 
   const loadReservations = useCallback(async () => {
     try {
@@ -146,6 +154,47 @@ export default function AdminApp() {
     }
   }
 
+  async function submitBlock(e: React.FormEvent) {
+    e.preventDefault();
+    setBlockBusy(true);
+    setBlockError(null);
+    try {
+      const res = await fetch("/api/admin/reservations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          label: blockLabel,
+          startDate: blockStart,
+          endDate: blockEnd,
+          note: blockNote,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 401) {
+        setView("login");
+        return;
+      }
+      if (!res.ok) {
+        setBlockError(data.error ?? "Nepodařilo se zablokovat termín.");
+        return;
+      }
+      setReservations((prev) =>
+        [...prev, data.reservation as Reservation].sort((a, b) =>
+          a.startDate.localeCompare(b.startDate)
+        )
+      );
+      setBlockLabel("");
+      setBlockStart("");
+      setBlockEnd("");
+      setBlockNote("");
+      setShowBlockForm(false);
+    } catch {
+      setBlockError("Nepodařilo se spojit se serverem.");
+    } finally {
+      setBlockBusy(false);
+    }
+  }
+
   if (view === "checking") {
     return <p className="text-sm text-stone">Načítám…</p>;
   }
@@ -187,14 +236,23 @@ export default function AdminApp() {
 
   return (
     <div>
-      <div className="mb-5 flex items-center justify-between">
-        <button
-          onClick={loadReservations}
-          className="flex items-center gap-1.5 text-sm text-stone hover:text-forest-dark"
-        >
-          <RefreshCw className="h-4 w-4" />
-          Obnovit
-        </button>
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={loadReservations}
+            className="flex items-center gap-1.5 text-sm text-stone hover:text-forest-dark"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Obnovit
+          </button>
+          <button
+            onClick={() => setShowBlockForm((v) => !v)}
+            className="flex items-center gap-1.5 text-sm text-stone hover:text-forest-dark"
+          >
+            <Ban className="h-4 w-4" />
+            Zablokovat termín
+          </button>
+        </div>
         <button
           onClick={handleLogout}
           className="flex items-center gap-1.5 text-sm text-stone hover:text-forest-dark"
@@ -203,6 +261,82 @@ export default function AdminApp() {
           Odhlásit
         </button>
       </div>
+
+      {showBlockForm && (
+        <form
+          onSubmit={submitBlock}
+          className="mb-5 rounded-2xl bg-background p-5 ring-1 ring-black/5"
+        >
+          <div className="flex items-center justify-between">
+            <h3 className="font-display text-base text-forest-dark">
+              Zablokovat termín
+            </h3>
+            <button
+              type="button"
+              onClick={() => setShowBlockForm(false)}
+              className="text-stone/50 hover:text-stone"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          <p className="mt-1 text-xs text-stone">
+            Termín se v kalendáři na webu zobrazí jako obsazený, bez toho,
+            aby musel poslat žádost skutečný host.
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <label className="text-xs text-stone">
+              Popis (např. „Rodinná dovolená“)
+              <input
+                type="text"
+                value={blockLabel}
+                onChange={(e) => setBlockLabel(e.target.value)}
+                required
+                minLength={2}
+                className="mt-1 w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm text-forest-dark outline-none focus:border-forest/40"
+              />
+            </label>
+            <label className="text-xs text-stone">
+              Poznámka (nepovinné)
+              <input
+                type="text"
+                value={blockNote}
+                onChange={(e) => setBlockNote(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm text-forest-dark outline-none focus:border-forest/40"
+              />
+            </label>
+            <label className="text-xs text-stone">
+              Od
+              <input
+                type="date"
+                value={blockStart}
+                onChange={(e) => setBlockStart(e.target.value)}
+                required
+                className="mt-1 w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm text-forest-dark outline-none focus:border-forest/40"
+              />
+            </label>
+            <label className="text-xs text-stone">
+              Do
+              <input
+                type="date"
+                value={blockEnd}
+                onChange={(e) => setBlockEnd(e.target.value)}
+                required
+                className="mt-1 w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm text-forest-dark outline-none focus:border-forest/40"
+              />
+            </label>
+          </div>
+          {blockError && (
+            <p className="mt-3 text-sm text-red-600">{blockError}</p>
+          )}
+          <button
+            type="submit"
+            disabled={blockBusy}
+            className="mt-4 rounded-xl bg-forest-dark px-4 py-2 text-sm font-semibold text-cream transition-opacity disabled:opacity-50"
+          >
+            {blockBusy ? "Ukládám…" : "Zablokovat"}
+          </button>
+        </form>
+      )}
 
       {listError && <p className="mb-4 text-sm text-red-600">{listError}</p>}
       {actionError && (
@@ -226,63 +360,81 @@ export default function AdminApp() {
                 <div>
                   <p className="font-display text-base text-forest-dark">
                     {r.name}{" "}
-                    <span
-                      className={`ml-2 rounded-full px-2.5 py-0.5 align-middle text-xs font-semibold ${STATUS_CLASS[r.status]}`}
-                    >
-                      {STATUS_LABEL[r.status]}
-                    </span>
+                    {r.blocked ? (
+                      <span className="ml-2 rounded-full bg-black/10 px-2.5 py-0.5 align-middle text-xs font-semibold text-forest-dark/70">
+                        Zablokováno
+                      </span>
+                    ) : (
+                      <span
+                        className={`ml-2 rounded-full px-2.5 py-0.5 align-middle text-xs font-semibold ${STATUS_CLASS[r.status]}`}
+                      >
+                        {STATUS_LABEL[r.status]}
+                      </span>
+                    )}
                   </p>
                   <p className="mt-1 text-sm text-stone">
-                    {fmtDate(r.startDate)} – {fmtDate(r.endDate)} ·{" "}
-                    {r.guests} {r.guests === 1 ? "host" : "hosté"}
-                  </p>
-                  <p className="mt-1 text-sm text-stone">
-                    <a href={`mailto:${r.email}`} className="hover:text-forest-dark">
-                      {r.email}
-                    </a>
-                    {r.phone && (
+                    {fmtDate(r.startDate)} – {fmtDate(r.endDate)}
+                    {!r.blocked && (
                       <>
-                        {" · "}
-                        <a href={`tel:${r.phone}`} className="hover:text-forest-dark">
-                          {r.phone}
-                        </a>
+                        {" "}
+                        · {r.guests} {r.guests === 1 ? "host" : "hosté"}
                       </>
                     )}
                   </p>
+                  {!r.blocked && (
+                    <p className="mt-1 text-sm text-stone">
+                      <a href={`mailto:${r.email}`} className="hover:text-forest-dark">
+                        {r.email}
+                      </a>
+                      {r.phone && (
+                        <>
+                          {" · "}
+                          <a href={`tel:${r.phone}`} className="hover:text-forest-dark">
+                            {r.phone}
+                          </a>
+                        </>
+                      )}
+                    </p>
+                  )}
                   {r.note && (
                     <p className="mt-2 max-w-xl text-sm italic text-stone/80">
                       „{r.note}“
                     </p>
                   )}
                   <p className="mt-2 text-xs text-stone/40">
-                    Odesláno {format(parseISO(r.createdAt), "d. M. yyyy H:mm")}
+                    {r.blocked ? "Vytvořeno" : "Odesláno"}{" "}
+                    {format(parseISO(r.createdAt), "d. M. yyyy H:mm")}
                   </p>
                 </div>
 
                 <div className="flex shrink-0 items-center gap-2">
-                  <select
-                    value={r.status}
-                    disabled={busyId === r.id}
-                    onChange={(e) =>
-                      updateStatus(r.id, e.target.value as Reservation["status"])
-                    }
-                    className="rounded-lg border border-black/10 bg-white px-2.5 py-1.5 text-xs text-forest-dark outline-none disabled:opacity-50"
-                  >
-                    <option value="pending">Čeká na potvrzení</option>
-                    <option value="confirmed">Potvrdit</option>
-                    <option value="cancelled">Zrušit</option>
-                  </select>
-                  <a
-                    href={`/api/admin/reservations/${r.id}/ics`}
-                    title="Export do kalendáře (.ics)"
-                    className="rounded-lg p-1.5 text-stone/50 transition-colors hover:bg-forest/10 hover:text-forest-dark"
-                  >
-                    <CalendarPlus className="h-4 w-4" />
-                  </a>
+                  {!r.blocked && (
+                    <>
+                      <select
+                        value={r.status}
+                        disabled={busyId === r.id}
+                        onChange={(e) =>
+                          updateStatus(r.id, e.target.value as Reservation["status"])
+                        }
+                        className="rounded-lg border border-black/10 bg-white px-2.5 py-1.5 text-xs text-forest-dark outline-none disabled:opacity-50"
+                      >
+                        <option value="pending">Čeká na potvrzení</option>
+                        <option value="confirmed">Potvrdit</option>
+                        <option value="cancelled">Zrušit</option>
+                      </select>
+                      <a
+                        href={`/api/admin/reservations/${r.id}/ics`}
+                        title="Export do kalendáře (.ics)"
+                        className="rounded-lg p-1.5 text-stone/50 transition-colors hover:bg-forest/10 hover:text-forest-dark"
+                      >
+                        <CalendarPlus className="h-4 w-4" />
+                      </a>
+                    </>
+                  )}
                   <button
                     onClick={() => deleteReservation(r.id)}
                     disabled={busyId === r.id}
-                    title="Smazat rezervaci"
+                    title={r.blocked ? "Zrušit blokaci" : "Smazat rezervaci"}
                     className="rounded-lg p-1.5 text-stone/50 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
                   >
                     <Trash2 className="h-4 w-4" />

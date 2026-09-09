@@ -24,6 +24,9 @@ export type Reservation = {
   note?: string;
   status: "pending" | "confirmed" | "cancelled";
   createdAt: string;
+  /** true for a date range blocked directly from the admin page (no real
+   * guest) rather than an actual reservation request. */
+  blocked?: boolean;
 };
 
 const REDIS_KEY = "chata-vresovice:reservations";

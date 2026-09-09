@@ -21,6 +21,9 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://www.chatavresovice.cz"),
   title: SITE_TITLE,
   description: SITE_DESCRIPTION,
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
