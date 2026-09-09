@@ -24,7 +24,10 @@ const item: Variants = {
 
 export default function Hero() {
   return (
-    <section className="relative flex min-h-[92vh] items-center overflow-hidden bg-forest-dark text-cream">
+    <section
+      id="hero"
+      className="relative flex min-h-[92vh] items-center overflow-hidden bg-forest-dark text-cream"
+    >
       {/* Real, cross-fading forest/wildlife footage backdrop */}
       <VideoScene />
 

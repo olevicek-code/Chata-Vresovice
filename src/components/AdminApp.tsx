@@ -361,7 +361,7 @@ export default function AdminApp() {
                   <p className="font-display text-base text-forest-dark">
                     {r.name}{" "}
                     {r.blocked ? (
-                      <span className="ml-2 rounded-full bg-black/10 px-2.5 py-0.5 align-middle text-xs font-semibold text-forest-dark/70">
+                      <span className="ml-2 rounded-full bg-stone/15 px-2.5 py-0.5 align-middle text-xs font-semibold text-stone">
                         Zablokováno
                       </span>
                     ) : (

@@ -40,6 +40,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 .font-display {
@@ -155,4 +156,59 @@ body {
     scale(1.6);
   background: color-mix(in srgb, var(--signal) 14%, transparent);
   border-color: var(--signal);
+}
+
+/* ---- dark mode ------------------------------------------------------
+   Only the page CONTENT (everything inside <main>) follows the toggle.
+   The navbar and hero keep their fixed look on purpose: the navbar is
+   always a light bar with dark text regardless of scroll position or
+   theme (see the earlier "invisible navbar text" fix – making it theme-
+   aware would reopen exactly that bug), and the hero always sits on its
+   own dark video backdrop. So --forest-dark itself (used as a background
+   surface for the footer, hero button, etc.) is never touched here –
+   only the *text* utilities that read it for headings on light content
+   backgrounds get redirected to a light color once the page turns dark. */
+
+[data-theme="dark"] {
+  --background: #12160f;
+  --foreground: #efe9dd;
+}
+
+[data-theme="dark"] main .text-forest-dark:not(#hero *),
+[data-theme="dark"] main .text-forest-dark\/60:not(#hero *),
+[data-theme="dark"] main .text-forest-dark\/70:not(#hero *),
+[data-theme="dark"] main .text-forest-dark\/80:not(#hero *),
+[data-theme="dark"] main .text-forest-dark\/90:not(#hero *),
+[data-theme="dark"] main .hover\:text-forest-dark:hover:not(#hero *) {
+  color: var(--foreground);
+}
+
+[data-theme="dark"] main .text-forest:not(#hero *) {
+  color: #84c2a0;
+}
+
+[data-theme="dark"] main .text-wood:not(#hero *) {
+  color: #dba876;
+}
+
+[data-theme="dark"] main .text-stone:not(#hero *),
+[data-theme="dark"] main .text-stone\/40:not(#hero *),
+[data-theme="dark"] main .text-stone\/50:not(#hero *),
+[data-theme="dark"] main .text-stone\/60:not(#hero *),
+[data-theme="dark"] main .text-stone\/70:not(#hero *),
+[data-theme="dark"] main .text-stone\/80:not(#hero *) {
+  color: #aca595;
+}
+
+[data-theme="dark"] main .ring-black\/5,
+[data-theme="dark"] main .ring-black\/10 {
+  --tw-ring-color: color-mix(in srgb, white 12%, transparent);
+}
+
+[data-theme="dark"] main .border-black\/10 {
+  border-color: color-mix(in srgb, white 15%, transparent);
+}
+
+[data-theme="dark"] main .bg-white {
+  background-color: color-mix(in srgb, black 25%, var(--background));
 }

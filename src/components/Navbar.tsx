@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Menu, X, TreePine } from "lucide-react";
 import AmbientSound from "./AmbientSound";
+import ThemeToggle from "./ThemeToggle";
 
 const HOME_LINKS = [
   { href: "/#o-chate", label: "O chatě", id: "o-chate" },
@@ -91,7 +92,8 @@ export default function Navbar() {
             </Link>
           </nav>
 
-          <div className="text-forest-dark">
+          <div className="flex items-center text-forest-dark">
+            <ThemeToggle />
             <AmbientSound />
           </div>
 

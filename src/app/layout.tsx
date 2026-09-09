@@ -43,6 +43,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="cs" className={`h-full antialiased ${jetbrainsMono.variable}`}>
       <body className="min-h-full flex flex-col bg-background text-foreground">
+        {/* Sets the initial light/dark theme before hydration (from the
+            saved choice, or a quick hour-of-day guess) so there's no flash
+            of the wrong theme. ThemeToggle takes over afterwards and
+            refines the "auto" guess with the real sunrise/sunset. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var s=localStorage.getItem('chata-theme');var t=s;if(t!=='light'&&t!=='dark'){var h=new Date().getHours();t=(h>=7&&h<20)?'light':'dark';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`,
+          }}
+        />
         <CustomCursor />
         <ScrollProgress />
         {/* faint grain texture over the whole page for a more tactile,
