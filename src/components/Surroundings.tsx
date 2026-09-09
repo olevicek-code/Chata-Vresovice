@@ -3,6 +3,7 @@ import AttractionsExplorer from "./AttractionsExplorer";
 import ChribyTrails from "./ChribyTrails";
 import TrailPlanner from "./TrailPlanner";
 import LocationMap from "./LocationMap";
+import WeatherForecast from "./WeatherForecast";
 
 export default function Surroundings() {
   return (
@@ -25,6 +26,10 @@ export default function Surroundings() {
         </AnimatedSection>
 
         <AnimatedSection delay={0.05} className="mt-10">
+          <WeatherForecast />
+        </AnimatedSection>
+
+        <AnimatedSection delay={0.08} className="mt-10">
           <AttractionsExplorer />
         </AnimatedSection>
 

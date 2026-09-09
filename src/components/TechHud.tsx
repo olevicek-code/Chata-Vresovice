@@ -1,18 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  Sun,
-  Moon,
-  Cloud,
-  CloudSun,
-  CloudRain,
-  CloudSnow,
-  CloudFog,
-  CloudLightning,
-  Radio,
-} from "lucide-react";
+import { Radio } from "lucide-react";
 import { CHATA } from "@/lib/leaflet";
+import { weatherColor, weatherIcon, weatherLabel } from "@/lib/weather";
 
 const LAT = CHATA.lat;
 const LON = CHATA.lon;
@@ -23,42 +14,6 @@ type Weather = {
   sunrise: string;
   sunset: string;
 };
-
-function weatherIcon(code: number, isDay: boolean) {
-  if (code === 0) return isDay ? Sun : Moon;
-  if (code <= 2) return CloudSun;
-  if (code === 3) return Cloud;
-  if (code >= 45 && code <= 48) return CloudFog;
-  if (code >= 51 && code <= 67) return CloudRain;
-  if (code >= 71 && code <= 86) return CloudSnow;
-  if (code >= 95) return CloudLightning;
-  return Cloud;
-}
-
-/** Icon color shifts with the actual condition – amber sun, blue rain,
- * pale cyan snow, grey fog/cloud – so the HUD visibly reacts instead of
- * just swapping a same-colored glyph. */
-function weatherColor(code: number, isDay: boolean) {
-  if (code === 0) return isDay ? "#fbbf24" : "#a5b4fc";
-  if (code <= 2) return isDay ? "#f2c675" : "#93c5fd";
-  if (code === 3) return "#cbd5c8";
-  if (code >= 45 && code <= 48) return "#9ca3af";
-  if (code >= 51 && code <= 67) return "#5eb8e0";
-  if (code >= 71 && code <= 86) return "#d6ecf5";
-  if (code >= 95) return "#f0a35e";
-  return "#55e0a8";
-}
-
-function weatherLabel(code: number) {
-  if (code === 0) return "Jasno";
-  if (code <= 2) return "Polojasno";
-  if (code === 3) return "Zataženo";
-  if (code >= 45 && code <= 48) return "Mlha";
-  if (code >= 51 && code <= 67) return "Déšť";
-  if (code >= 71 && code <= 86) return "Sníh";
-  if (code >= 95) return "Bouřka";
-  return "Načítám";
-}
 
 /** Live "instrument panel" over the hero: local time and real weather at
  * the cottage's coordinates — small proof that this isn't just a static
