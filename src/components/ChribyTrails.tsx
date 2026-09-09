@@ -20,7 +20,7 @@ export default function ChribyTrails() {
                 onClick={() => setActiveIndex(isOpen ? null : i)}
                 className="flex w-full items-center gap-4 px-5 py-4 text-left transition-colors hover:bg-forest/5"
               >
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-wood-light text-xs font-bold text-forest-dark">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-wood-light text-xs font-bold text-[#1d2f26]">
                   {i + 1}
                 </span>
                 <span className="min-w-0 flex-1">

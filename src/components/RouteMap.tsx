@@ -55,7 +55,7 @@ export default function RouteMap({ stops }: { stops: RouteStop[] }) {
 
         stops.forEach((s, i) => {
           L.marker([s.lat, s.lon], {
-            icon: pinIcon(L, String(i + 1), "bg-wood-light font-bold text-forest-dark"),
+            icon: pinIcon(L, String(i + 1), "bg-wood-light font-bold text-[#1d2f26]"),
           })
             .addTo(map)
             .bindPopup?.(s.label);
