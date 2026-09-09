@@ -82,11 +82,21 @@ export async function POST(request: NextRequest) {
     createdAt: new Date().toISOString(),
   };
 
-  const reservations = await getReservations();
-  reservations.push(reservation);
-  await saveReservations(reservations);
+  try {
+    const reservations = await getReservations();
+    reservations.push(reservation);
+    await saveReservations(reservations);
 
-  await sendReservationEmails(reservation);
+    await sendReservationEmails(reservation);
 
-  return NextResponse.json({ reservation }, { status: 201 });
+    return NextResponse.json({ reservation }, { status: 201 });
+  } catch (err) {
+    // TEMPORARY verbose error for debugging a production 500 — revert once
+    // the root cause is found.
+    console.error("[reservations] POST failed:", err);
+    return NextResponse.json(
+      { error: "DEBUG: " + (err instanceof Error ? err.message : String(err)) },
+      { status: 500 }
+    );
+  }
 }
