@@ -4,7 +4,7 @@ import { Home, Sprout } from "lucide-react";
 
 export default function History() {
   return (
-    <section id="historie" className="bg-[#f2ede9] py-24">
+    <section id="historie" className="bg-[var(--background-alt)] py-24">
       <div className="mx-auto max-w-4xl px-5">
         <AnimatedSection>
           <p className="text-sm font-semibold uppercase tracking-widest text-wood">
@@ -22,7 +22,7 @@ export default function History() {
 
         <div className="mt-14 space-y-10 border-l-2 border-forest/20 pl-8 sm:pl-10">
           <AnimatedSection className="relative">
-            <span className="absolute -left-[calc(2rem+7px)] top-1 flex h-4 w-4 items-center justify-center rounded-full bg-forest ring-4 ring-[#f2ede9] sm:-left-[calc(2.5rem+7px)]" />
+            <span className="absolute -left-[calc(2rem+7px)] top-1 flex h-4 w-4 items-center justify-center rounded-full bg-forest ring-4 ring-[var(--background-alt)] sm:-left-[calc(2.5rem+7px)]" />
             <div className="rounded-2xl bg-background p-6 shadow-sm ring-1 ring-black/5 sm:p-8">
               <div className="flex flex-wrap items-center gap-3">
                 <span className="rounded-full bg-forest/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-forest-dark">
@@ -55,7 +55,7 @@ export default function History() {
           </AnimatedSection>
 
           <AnimatedSection delay={0.1} className="relative">
-            <span className="absolute -left-[calc(2rem+7px)] top-1 flex h-4 w-4 items-center justify-center rounded-full border-2 border-dashed border-forest/40 bg-[#f2ede9] ring-4 ring-[#f2ede9] sm:-left-[calc(2.5rem+7px)]" />
+            <span className="absolute -left-[calc(2rem+7px)] top-1 flex h-4 w-4 items-center justify-center rounded-full border-2 border-dashed border-forest/40 bg-[var(--background-alt)] ring-4 ring-[var(--background-alt)] sm:-left-[calc(2.5rem+7px)]" />
             <div className="rounded-2xl border-2 border-dashed border-forest/25 bg-forest/[0.03] p-6 sm:p-8">
               <div className="flex flex-wrap items-center gap-3">
                 <span className="rounded-full bg-forest/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-forest-dark">

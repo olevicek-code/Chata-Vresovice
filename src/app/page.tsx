@@ -39,13 +39,13 @@ export default function Home() {
       />
       <Hero />
       <About />
-      <WaveDivider bg="var(--background)" wave="#f2ede9" />
+      <WaveDivider bg="var(--background)" wave="var(--background-alt)" />
       <History />
-      <WaveDivider bg="#f2ede9" wave="var(--forest-dark)" />
+      <WaveDivider bg="var(--background-alt)" wave="var(--forest-dark)" />
       <QuickFacts />
-      <WaveDivider bg="var(--forest-dark)" wave="#f2ede9" />
+      <WaveDivider bg="var(--forest-dark)" wave="var(--background-alt)" />
       <Surroundings />
-      <WaveDivider bg="#f2ede9" wave="var(--background)" />
+      <WaveDivider bg="var(--background-alt)" wave="var(--background)" />
       <Gallery />
       <FAQ />
       <WaveDivider bg="var(--background)" wave="var(--forest-dark)" />

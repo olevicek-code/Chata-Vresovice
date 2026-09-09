@@ -2,6 +2,7 @@
 
 :root {
   --background: #faf7f2;
+  --background-alt: #f2ede9;
   --foreground: #23291f;
   --forest: #2f4a3c;
   --forest-dark: #1d2f26;
@@ -170,6 +171,7 @@ body {
 
 [data-theme="dark"] {
   --background: #12160f;
+  --background-alt: #171c14;
   --foreground: #efe9dd;
 }
 
