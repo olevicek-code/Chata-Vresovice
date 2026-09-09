@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { format, parseISO } from "date-fns";
-import { Lock, LogOut, RefreshCw, Trash2 } from "lucide-react";
+import { CalendarPlus, Lock, LogOut, RefreshCw, Trash2 } from "lucide-react";
 import type { Reservation } from "@/lib/reservations";
 
 type ViewState = "checking" | "login" | "ready";
@@ -34,6 +34,7 @@ export default function AdminApp() {
   const [loginError, setLoginError] = useState<string | null>(null);
   const [loginBusy, setLoginBusy] = useState(false);
   const [listError, setListError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
 
   const loadReservations = useCallback(async () => {
@@ -94,17 +95,27 @@ export default function AdminApp() {
 
   async function updateStatus(id: string, status: Reservation["status"]) {
     setBusyId(id);
+    setActionError(null);
     try {
       const res = await fetch("/api/admin/reservations", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, status }),
       });
-      if (res.ok) {
-        setReservations((prev) =>
-          prev.map((r) => (r.id === id ? { ...r, status } : r))
-        );
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 401) {
+        setView("login");
+        return;
       }
+      if (!res.ok) {
+        setActionError(data.error ?? "Nepodařilo se uložit změnu stavu.");
+        return;
+      }
+      setReservations((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, status } : r))
+      );
+    } catch {
+      setActionError("Nepodařilo se spojit se serverem.");
     } finally {
       setBusyId(null);
     }
@@ -113,13 +124,23 @@ export default function AdminApp() {
   async function deleteReservation(id: string) {
     if (!window.confirm("Opravdu trvale smazat tuto rezervaci?")) return;
     setBusyId(id);
+    setActionError(null);
     try {
       const res = await fetch(`/api/admin/reservations?id=${encodeURIComponent(id)}`, {
         method: "DELETE",
       });
-      if (res.ok) {
-        setReservations((prev) => prev.filter((r) => r.id !== id));
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 401) {
+        setView("login");
+        return;
       }
+      if (!res.ok) {
+        setActionError(data.error ?? "Nepodařilo se smazat rezervaci.");
+        return;
+      }
+      setReservations((prev) => prev.filter((r) => r.id !== id));
+    } catch {
+      setActionError("Nepodařilo se spojit se serverem.");
     } finally {
       setBusyId(null);
     }
@@ -184,6 +205,11 @@ export default function AdminApp() {
       </div>
 
       {listError && <p className="mb-4 text-sm text-red-600">{listError}</p>}
+      {actionError && (
+        <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+          {actionError}
+        </p>
+      )}
 
       {reservations.length === 0 && !listError ? (
         <p className="rounded-2xl bg-background p-6 text-sm text-stone ring-1 ring-black/5">
@@ -246,6 +272,13 @@ export default function AdminApp() {
                     <option value="confirmed">Potvrdit</option>
                     <option value="cancelled">Zrušit</option>
                   </select>
+                  <a
+                    href={`/api/admin/reservations/${r.id}/ics`}
+                    title="Export do kalendáře (.ics)"
+                    className="rounded-lg p-1.5 text-stone/50 transition-colors hover:bg-forest/10 hover:text-forest-dark"
+                  >
+                    <CalendarPlus className="h-4 w-4" />
+                  </a>
                   <button
                     onClick={() => deleteReservation(r.id)}
                     disabled={busyId === r.id}
