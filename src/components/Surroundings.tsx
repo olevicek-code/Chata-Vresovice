@@ -4,8 +4,10 @@ import ChribyTrails from "./ChribyTrails";
 import TrailPlanner from "./TrailPlanner";
 import LocationMap from "./LocationMap";
 import WeatherForecast from "./WeatherForecast";
+import LocalEvents from "./LocalEvents";
+import type { LocalEvent } from "@/lib/events";
 
-export default function Surroundings() {
+export default function Surroundings({ events }: { events: LocalEvent[] }) {
   return (
     <section id="okoli" className="bg-forest/5 py-24">
       <div className="mx-auto max-w-6xl px-5">
@@ -32,6 +34,12 @@ export default function Surroundings() {
         <AnimatedSection delay={0.08} className="mt-10">
           <AttractionsExplorer />
         </AnimatedSection>
+
+        {events.length > 0 && (
+          <AnimatedSection delay={0.1} className="mt-16">
+            <LocalEvents events={events} />
+          </AnimatedSection>
+        )}
 
         <AnimatedSection delay={0.1} className="mt-16">
           <p className="text-sm font-semibold uppercase tracking-widest text-wood">

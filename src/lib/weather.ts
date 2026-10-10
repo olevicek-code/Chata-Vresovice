@@ -12,13 +12,24 @@ import {
 /** Shared Open-Meteo weather-code helpers (icon, label, accent color) used
  * by both the hero HUD and the 7-day forecast, so the two stay visually
  * consistent instead of drifting apart. */
+// WMO codes: 51–67 drizzle/rain and 80–82 rain showers; 71–77 snow and
+// 85–86 snow showers. (80–82 sit inside the snow range numerically, which
+// once made the site report "Sníh" on a 12 °C showery day.)
+function isRain(code: number) {
+  return (code >= 51 && code <= 67) || (code >= 80 && code <= 82);
+}
+
+function isSnow(code: number) {
+  return (code >= 71 && code <= 77) || code === 85 || code === 86;
+}
+
 export function weatherIcon(code: number, isDay: boolean) {
   if (code === 0) return isDay ? Sun : Moon;
   if (code <= 2) return CloudSun;
   if (code === 3) return Cloud;
   if (code >= 45 && code <= 48) return CloudFog;
-  if (code >= 51 && code <= 67) return CloudRain;
-  if (code >= 71 && code <= 86) return CloudSnow;
+  if (isRain(code)) return CloudRain;
+  if (isSnow(code)) return CloudSnow;
   if (code >= 95) return CloudLightning;
   return Cloud;
 }
@@ -31,8 +42,8 @@ export function weatherColor(code: number, isDay: boolean) {
   if (code <= 2) return isDay ? "#f2c675" : "#93c5fd";
   if (code === 3) return "#cbd5c8";
   if (code >= 45 && code <= 48) return "#9ca3af";
-  if (code >= 51 && code <= 67) return "#5eb8e0";
-  if (code >= 71 && code <= 86) return "#d6ecf5";
+  if (isRain(code)) return "#5eb8e0";
+  if (isSnow(code)) return "#d6ecf5";
   if (code >= 95) return "#f0a35e";
   return "#55e0a8";
 }
@@ -42,8 +53,8 @@ export function weatherLabel(code: number) {
   if (code <= 2) return "Polojasno";
   if (code === 3) return "Zataženo";
   if (code >= 45 && code <= 48) return "Mlha";
-  if (code >= 51 && code <= 67) return "Déšť";
-  if (code >= 71 && code <= 86) return "Sníh";
+  if (isRain(code)) return "Déšť";
+  if (isSnow(code)) return "Sníh";
   if (code >= 95) return "Bouřka";
   return "Načítám";
 }

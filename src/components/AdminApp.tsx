@@ -4,8 +4,18 @@ import { useCallback, useEffect, useState } from "react";
 import { format, parseISO } from "date-fns";
 import { CalendarPlus, Ban, Lock, LogOut, RefreshCw, Trash2, X } from "lucide-react";
 import type { Reservation } from "@/lib/reservations";
+import AdminPhotos from "./AdminPhotos";
+import AdminEvents from "./AdminEvents";
 
 type ViewState = "checking" | "login" | "ready";
+
+type Tab = "rezervace" | "fotky" | "akce";
+
+const TABS: { id: Tab; label: string }[] = [
+  { id: "rezervace", label: "Rezervace" },
+  { id: "fotky", label: "Fotky" },
+  { id: "akce", label: "Akce v okolí" },
+];
 
 const STATUS_LABEL: Record<Reservation["status"], string> = {
   pending: "Čeká na potvrzení",
@@ -29,6 +39,8 @@ function fmtDate(iso: string) {
 
 export default function AdminApp() {
   const [view, setView] = useState<ViewState>("checking");
+  const [tab, setTab] = useState<Tab>("rezervace");
+  const showLogin = useCallback(() => setView("login"), []);
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -236,6 +248,35 @@ export default function AdminApp() {
 
   return (
     <div>
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-black/10">
+        <div className="flex gap-1">
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={`-mb-px border-b-2 px-3 py-2 text-sm font-semibold transition-colors ${
+                tab === t.id
+                  ? "border-forest-dark text-forest-dark"
+                  : "border-transparent text-stone hover:text-forest-dark"
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-1.5 pb-2 text-sm text-stone hover:text-forest-dark"
+        >
+          <LogOut className="h-4 w-4" />
+          Odhlásit
+        </button>
+      </div>
+
+      {tab === "fotky" && <AdminPhotos onUnauthorized={showLogin} />}
+      {tab === "akce" && <AdminEvents onUnauthorized={showLogin} />}
+      {tab === "rezervace" && (
+    <div>
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-4">
           <button
@@ -253,13 +294,6 @@ export default function AdminApp() {
             Zablokovat termín
           </button>
         </div>
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-1.5 text-sm text-stone hover:text-forest-dark"
-        >
-          <LogOut className="h-4 w-4" />
-          Odhlásit
-        </button>
       </div>
 
       {showBlockForm && (
@@ -444,6 +478,8 @@ export default function AdminApp() {
             </div>
           ))}
         </div>
+      )}
+    </div>
       )}
     </div>
   );

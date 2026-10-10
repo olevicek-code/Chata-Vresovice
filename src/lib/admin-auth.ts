@@ -7,6 +7,7 @@
  */
 
 import { createHmac, timingSafeEqual } from "crypto";
+import type { NextRequest } from "next/server";
 
 export const ADMIN_COOKIE_NAME = "chata_admin";
 
@@ -38,4 +39,8 @@ export function isValidSessionToken(token: string | undefined | null): boolean {
   const b = Buffer.from(expected);
   if (a.length !== b.length) return false;
   return timingSafeEqual(a, b);
+}
+
+export function isAdminRequest(request: NextRequest): boolean {
+  return isValidSessionToken(request.cookies.get(ADMIN_COOKIE_NAME)?.value);
 }

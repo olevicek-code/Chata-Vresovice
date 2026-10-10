@@ -1,4 +1,6 @@
+import Image from "next/image";
 import AnimatedSection from "./AnimatedSection";
+import type { Photo } from "@/lib/photo-sections";
 import {
   BedDouble,
   Users,
@@ -21,7 +23,7 @@ const AMENITIES = [
   { icon: Users, label: "Ideální pro rodiny i skupiny přátel" },
 ];
 
-export default function About() {
+export default function About({ photo }: { photo?: Photo }) {
   return (
     <section id="o-chate" className="bg-background py-24">
       <div className="mx-auto max-w-6xl px-5">
@@ -36,16 +38,16 @@ export default function About() {
 
         <div className="mt-12 grid gap-12 md:grid-cols-2 md:items-center">
           <AnimatedSection delay={0.05}>
-            {/* Placeholder photo – nahraďte skutečnou fotografií interiéru/exteriéru */}
-            <div className="flex aspect-[4/3] w-full items-center justify-center rounded-2xl bg-gradient-to-br from-wood-light/30 via-forest/10 to-forest/30 text-center text-stone">
-              <div>
-                <Trees className="mx-auto h-10 w-10 text-forest" />
-                <p className="mt-3 text-sm">
-                  Zde bude fotografie chaty
-                  <br />
-                  (nahraďte vlastním obrázkem)
-                </p>
-              </div>
+            {/* Main photo is chosen on the admin page (Fotky → "Hlavní fotka
+                v sekci O chatě"); until then, the photo from the purchase. */}
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl shadow-sm ring-1 ring-black/5">
+              <Image
+                src={photo?.url ?? "/images/chata-koupe-2025.jpg"}
+                alt={photo?.caption || "Chata Vřesovice"}
+                fill
+                sizes="(max-width: 768px) 100vw, 560px"
+                className="object-cover"
+              />
             </div>
           </AnimatedSection>
 

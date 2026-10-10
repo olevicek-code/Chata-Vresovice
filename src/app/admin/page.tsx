@@ -14,7 +14,7 @@ export default function AdminPage() {
           Administrace
         </p>
         <h1 className="section-heading mt-2 font-display text-3xl font-medium text-forest-dark sm:text-4xl">
-          Správa rezervací
+          Správa chaty
         </h1>
         <div className="mt-8">
           <AdminApp />

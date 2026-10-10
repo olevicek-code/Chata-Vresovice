@@ -7,6 +7,12 @@ import Gallery from "@/components/Gallery";
 import FAQ from "@/components/FAQ";
 import WaveDivider from "@/components/WaveDivider";
 import { CHATA } from "@/lib/leaflet";
+import { getPublicPhotos } from "@/lib/photos";
+import { getUpcomingEvents } from "@/lib/events";
+
+// Admin changes refresh the page immediately (revalidatePath); this hourly
+// refresh just makes past events drop off on their own.
+export const revalidate = 3600;
 
 const STRUCTURED_DATA = {
   "@context": "https://schema.org",
@@ -29,7 +35,13 @@ const STRUCTURED_DATA = {
   },
 };
 
-export default function Home() {
+export default async function Home() {
+  const [galleryPhotos, aboutPhotos, events] = await Promise.all([
+    getPublicPhotos("galerie"),
+    getPublicPhotos("o-chate"),
+    getUpcomingEvents(),
+  ]);
+
   return (
     <>
       <script
@@ -38,15 +50,15 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(STRUCTURED_DATA) }}
       />
       <Hero />
-      <About />
+      <About photo={aboutPhotos[0]} />
       <WaveDivider bg="var(--background)" wave="var(--background-alt)" />
       <History />
       <WaveDivider bg="var(--background-alt)" wave="var(--forest-dark)" />
       <QuickFacts />
       <WaveDivider bg="var(--forest-dark)" wave="var(--background-alt)" />
-      <Surroundings />
+      <Surroundings events={events} />
       <WaveDivider bg="var(--background-alt)" wave="var(--background)" />
-      <Gallery />
+      <Gallery photos={galleryPhotos} />
       <FAQ />
       <WaveDivider bg="var(--background)" wave="var(--forest-dark)" />
     </>
